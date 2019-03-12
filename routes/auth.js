@@ -10,7 +10,7 @@ router.post('/signup', authController.preSignUp, authController.postSignup);
 
 // POST SIGN IN
 
-router.post('/signin',authController.verifyToken, authController.postSignIn);
+router.post('/signin', authController.postSignIn);
 
 
 

@@ -1,7 +1,9 @@
 'use strict';
 module.exports = (sequelize, DataTypes) => {
   const tournament = sequelize.define('tournament', {
-    name: DataTypes.STRING,
+    name: {type: DataTypes.STRING,
+          allowNull: false
+    },
     numberCouples: DataTypes.INTEGER
   }, {});
   tournament.associate = function(models) {

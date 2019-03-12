@@ -9,17 +9,15 @@ exports.postTournament = (req,res,next) => {
     const numberCouples = req.body.numberCouples;
     user.findById(req.userId)
     .then(user => {
-        console.log(name, numberCouples);
         tournament.create({
             name: name,
             numberCouples: numberCouples,
             adminId: req.userId
+        }).then(tournament => {
+            res.status(201).json({msg:"Torneo creado con éxtio",
+            tournament: tournament
+        });
         })
-    })
-    .then(tournament => {
-        res.status(201).json({msg:"torneocreado",
-        tournament
-    });
     })
     .catch(err => console.log(err));
 };
@@ -27,7 +25,6 @@ exports.postTournament = (req,res,next) => {
 //Torneos de los que soy admin
 
 exports.getTournaments = (req, res, next) => {
-    console.log("aaaa");
     tournament.findAll({
         where: {
             adminId: req.userId
@@ -49,12 +46,32 @@ exports.deleteTournament = (req, res, next) => {
             id: tournamentId
         }
     }).then((a) => {
-        console.log(a);
         if(a){
-        return res.status(201).json({msg: "elemento destruido"})}
+        return res.status(201).json({msg: "Torneo eliminado"})}
         else{
-            return res.status(201).json({msg: "El torneo ya habia sido eliminado"})
+            return res.status(201).json({msg: "No es el admin de este torneo o ya fue eliminado"})
         }
     }).catch(err => console.log(err));
+
+};
+
+// Obtener datos de torneo que soy admin
+exports.getTournament = (req,res,next) => {
+    tournament.findOne({
+        where: {
+            id: req.params.tournamentId,
+            adminId: req.userId
+        }
+    })
+    .then(tournament => {
+        if(tournament && tournament.adminId === req.userId){
+        res.status(200).json({msg: 'Correcto', tournament: tournament});}
+        else {
+            res.status(400).json({msg: 'El torneo no existe o no es usted admin'})
+        }
+    })
+    .catch(err => {
+        console.log(err);
+    });
 
 };

@@ -34,13 +34,19 @@ app.post('/signin', authRouter);
 
 app.post('/signup', authRouter);
 
+//Eliminar torneo
+
 app.delete('/admin/tournament/:tournamentId', adminRouter);
 
 //Crear torneo
 app.post('/admin/tournament', adminRouter);
 
 //Obtener torneos que soy admin
-app.get('/admin/tournaments', adminRouter)
+app.get('/admin/tournaments', adminRouter);
+
+//Obetener un torneo
+
+app.get('/admin/tournament/:tournamentId',adminRouter);
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
