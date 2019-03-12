@@ -1,0 +1,31 @@
+const express = require('express');
+const router = express.Router();
+
+const {user} = require('../models/index');
+const authController = require('../controllers/auth');
+
+
+// POST REGISTRO
+router.post('/signup', authController.preSignUp, authController.postSignup);
+
+// POST SIGN IN
+
+router.post('/signin',authController.verifyToken, authController.postSignIn);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+module.exports = router;
