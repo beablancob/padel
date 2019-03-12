@@ -98,9 +98,3 @@ exports.verifyToken = (req,res, next) => {
 
 };
 
-exports.verifyAdmin = (req, res, next) => {
-    const adminId = req.params.tournamentId;
-    if(req.params.tournamentId === req.userId){
-        next();
-    }
-};
