@@ -34,6 +34,15 @@ app.post('/signin', authRouter);
 
 app.post('/signup', authRouter);
 
+//Añadir pareja a un torneo
+app.put('/admin/tournament/:tournamentId/addCouple', adminRouter);
+
+// Eliminar pareja de un torneo
+
+app.delete('/admin/tournament/:tournamentId/deleteCouple/:coupleId', adminRouter);
+
+
+
 //Eliminar torneo
 
 app.delete('/admin/tournament/:tournamentId', adminRouter);

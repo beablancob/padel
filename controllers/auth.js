@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
-const {user} = require('../models/index');
+const {user, tournament} = require('../models/index');
 
 //Comprobamos que no este duplicado el correo
 
@@ -78,6 +78,8 @@ exports.postSignIn = (req,res,next) => {
 };
 
 exports.verifyToken = (req,res, next) => {
+    console.log("aaaa");
+
     const token = req.headers['x-access-token'];
 
     if (!token) {
@@ -90,11 +92,41 @@ exports.verifyToken = (req,res, next) => {
         if(err){
             return res.json({msg: "token invalido"});
         }
-        console.log(decoded);
         req.userId = decoded.id;
 
         next();
     })
+
+};
+
+exports.isAdmin = (req, res, next) => {
+
+    
+
+    tournament.findOne({
+        where: {
+            id: req.params.tournamentId
+        }
+    })
+    .then(tournament => {
+        if(!tournament){
+
+            return res.status(404).json({msg: 'El id del torneo que busca no existe'});
+        
+        } else if( tournament.adminId !== req.userId){
+
+            return res.status(404).json({msg: 'Usted no es el administrador de este torneo'});
+
+        }
+        next();
+
+    })
+    .catch(err => console.log(err));
+
+
+
+    
+
 
 };
 

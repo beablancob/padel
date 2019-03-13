@@ -9,6 +9,7 @@ module.exports = (sequelize, DataTypes) => {
   tournament.associate = function(models) {
     // associations can be defined here
     tournament.belongsTo(models.user, {foreignKey: 'adminId'});
+    tournament.hasMany(models.couple, {foreignKey: 'tournamentId'})
 
   };
   return tournament;

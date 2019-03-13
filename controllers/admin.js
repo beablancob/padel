@@ -1,7 +1,6 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
-const {user} = require('../models/index');
-const {tournament} = require('../models/index');
+const {user, tournament, couple} = require('../models/index');
 
 //Crear torneo
 exports.postTournament = (req,res,next) => {
@@ -75,3 +74,44 @@ exports.getTournament = (req,res,next) => {
     });
 
 };
+
+// Añadir pareja a torneo que soy admin
+
+exports.postAddCouple = (req, res, next) => {
+    couple.create({
+        user1Id: req.body.user1Id,
+        user2Id: req.body.user2Id,
+        tournamentId: req.params.tournamentId
+    })
+    .then(couple => {
+
+        return res.status(201).json({msg:'Añadida correctamente',
+    couple: couple});
+    })
+    .catch(err => console.log(err));
+
+
+};
+
+// Eliminar pareja de torneo del que soy admin
+
+exports.deleteCouple = (req, res, next) => {
+    
+    couple.findById(req.params.coupleId)
+    .then(couple => {
+
+
+        if(couple && couple.tournamentId == req.params.tournamentId){
+            
+            couple.destroy()
+            .then(couple => {
+                
+                 return res.json({msg: 'Destruido correctamente'});
+            })
+        }else {
+            return res.json({msg: 'La pareja no es suya'});
+        } 
+    })
+    .catch(err => console.log(err));
+};
+

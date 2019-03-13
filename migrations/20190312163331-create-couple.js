@@ -8,13 +8,13 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      idUser1: {
+      user1Id: {
         type: Sequelize.INTEGER
       },
-      idUser2: {
+      user2Id: {
         type: Sequelize.INTEGER
       },
-      idTournament: {
+      tournamentId: {
         type: Sequelize.INTEGER
       },
       createdAt: {
