@@ -77,20 +77,60 @@ exports.getTournament = (req,res,next) => {
 
 // Añadir pareja a torneo que soy admin
 
-exports.postAddCouple = (req, res, next) => {
-    couple.create({
-        user1Id: req.body.user1Id,
-        user2Id: req.body.user2Id,
-        tournamentId: req.params.tournamentId
+exports.putAddCouple = (req, res, next) => {
+   
+   
+    //Buscar usuario1
+    user.findOne({
+        where: {
+            email: req.body.emailUser1
+        }
+    }).then(user => {
+
+        if(!user) {
+            return res.status(404).json({error: "El correo del jugador 1 no está registrado"});
+
+        };
+        
+        req.user1Id = user.id;
+
+        
+
+    }).then(() =>{
+
+        //Buscar usuario 2
+        user.findOne({
+            where: {
+                email: req.body.emailUser2
+            }
+        }).then(user => {
+    
+            if(!user) {
+                return res.status(404).json({error: "El correo del jugador 2 no está registrado"});
+    
+            };
+    
+            req.user2Id = user.id;
+
+            couple.create({
+                user1Id: req.user1Id,
+                user2Id: req.user2Id,
+                tournamentId: parseInt(req.params.tournamentId)
+            })
+            .then(couple => {
+        
+                return res.status(201).json({msg:'Añadida correctamente',
+            couple: couple});
+            })
+            
+    
+        })
+        .catch(err => {
+            console.log(err);
+        });
+
     })
-    .then(couple => {
-
-        return res.status(201).json({msg:'Añadida correctamente',
-    couple: couple});
-    })
-    .catch(err => console.log(err));
-
-
+    
 };
 
 // Eliminar pareja de torneo del que soy admin
@@ -106,7 +146,7 @@ exports.deleteCouple = (req, res, next) => {
             couple.destroy()
             .then(couple => {
                 
-                 return res.json({msg: 'Destruido correctamente'});
+                 return res.json({msg: 'Pareja eliminada correctamente'});
             })
         }else {
             return res.json({msg: 'La pareja no es suya'});
