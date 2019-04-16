@@ -21,7 +21,7 @@ exports.postTournament = (req,res,next) => {
     .catch(err => console.log(err));
 };
 
-//Torneos de los que soy admin
+//Obetener torneos de los que soy admin
 
 exports.getTournaments = (req, res, next) => {
     tournament.findAll({
@@ -60,7 +60,7 @@ exports.getTournament = (req,res,next) => {
         where: {
             id: req.params.tournamentId,
             adminId: req.userId
-        }
+        }, include:[couple]
     })
     .then(tournament => {
         if(tournament && tournament.adminId === req.userId){
@@ -112,19 +112,25 @@ exports.putAddCouple = (req, res, next) => {
     
             req.user2Id = user.id;
 
+        }).then(() => {
+
+
             couple.create({
                 user1Id: req.user1Id,
                 user2Id: req.user2Id,
                 tournamentId: parseInt(req.params.tournamentId)
             })
             .then(couple => {
-        
+                
+                if(couple.user1Id && couple.user2Id){
                 return res.status(201).json({msg:'Añadida correctamente',
-            couple: couple});
-            })
-            
+                                            couple: couple});
+                };
+                
+        })
     
         })
+        
         .catch(err => {
             console.log(err);
         });

@@ -25,6 +25,22 @@ module.exports = {
       adminId: {
         type: Sequelize.INTEGER,
         allowNull:false
+      },
+      puntosPG: {type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 0
+      },
+      puntosPP: {type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue:0
+      },
+      rondaActual:{type: Sequelize.INTEGER,
+        defaultValue: 0
+      }, 
+      idaYvuelta: {
+        type: Sequelize.BOOLEAN,
+        defaultValue:false
+    
       }
     });
   },

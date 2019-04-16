@@ -10,7 +10,7 @@ var usersRouter = require('./routes/users');
 var authRouter = require('./routes/auth');
 var adminRouter = require('./routes/admin')
 
-const {user, tournament} = require('./models/index');
+const {user, tournament, couple} = require('./models/index');
 
 
 
@@ -25,6 +25,16 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
+
+
+tournament.findAll({include: [couple]})
+.then(tournament => {
+  console.log(JSON.stringify(tournament));
+
+  }
+
+);
 
 //LOGIN
 

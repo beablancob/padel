@@ -4,7 +4,28 @@ module.exports = (sequelize, DataTypes) => {
     name: {type: DataTypes.STRING,
           allowNull: false
     },
-    numberCouples: DataTypes.INTEGER
+    numberCouples: {type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0
+    }
+  ,
+  puntosPG: {type: DataTypes.INTEGER,
+    allowNull: false,
+    defaultValue: 0
+  },
+  puntosPP: {type: DataTypes.INTEGER,
+    allowNull: false,
+    defaultValue:0
+  },
+  rondaActual:{type: DataTypes.INTEGER,
+    defaultValue: 0
+  }, 
+  idaYvuelta: {
+    type: DataTypes.BOOLEAN,
+    defaultValue:false
+
+  }
+
   }, {});
   tournament.associate = function(models) {
     // associations can be defined here

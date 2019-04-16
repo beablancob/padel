@@ -26,8 +26,8 @@ router.get('/admin/tournaments', authController.verifyToken, adminController.get
 //Obtener datos de un torneo
 
 router.get('/admin/tournament/:tournamentId', authController.verifyToken, adminController.getTournament);
-// Crear torneo
 
+// Crear torneo
 router.post('/admin/tournament', authController.verifyToken, adminController.postTournament);
 
 

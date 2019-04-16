@@ -24,7 +24,35 @@ module.exports = {
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE
+      },
+      partidosJugados: {
+        type:Sequelize.INTEGER
+      },
+      partidosGanados: {
+        type:Sequelize.INTEGER
+      },
+      partidosPerdidos: {
+        type:Sequelize.INTEGER
+      },
+      setsGanados: {
+        type:Sequelize.INTEGER
+      },
+      setsPerdidos: {
+        type:Sequelize.INTEGER
+      },
+      juegosGanados: {
+        type:Sequelize.INTEGER
+      },
+      juegosPerdidos: {
+        type:Sequelize.INTEGER
+      },
+      puntos: {
+        type:Sequelize.INTEGER
       }
+
+
+
+
     });
   },
   down: (queryInterface, Sequelize) => {
