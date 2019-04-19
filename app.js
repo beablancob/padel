@@ -28,13 +28,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 
 
-tournament.findAll({include: [couple]})
-.then(tournament => {
-  console.log(JSON.stringify(tournament));
 
-  }
-
-);
 
 //LOGIN
 
@@ -44,12 +38,17 @@ app.post('/signin', authRouter);
 
 app.post('/signup', authRouter);
 
+//Editar torneo que soy admin si no esta empezado
+
+app.put('/admin/tournament/:tournamentId/edit', adminRouter);
+
 //Añadir pareja a un torneo
 app.put('/admin/tournament/:tournamentId/addCouple', adminRouter);
 
 // Eliminar pareja de un torneo
 
 app.delete('/admin/tournament/:tournamentId/deleteCouple/:coupleId', adminRouter);
+
 
 
 

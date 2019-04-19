@@ -41,6 +41,14 @@ module.exports = {
         type: Sequelize.BOOLEAN,
         defaultValue:false
     
+      },
+      numeroRondas: {
+        type: Sequelize.INTEGER,
+        defaultValue:0
+      },
+      parejasSuben: {
+        type:Sequelize.INTEGER,
+        defaultValue:0
       }
     });
   },

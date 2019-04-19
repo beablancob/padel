@@ -78,7 +78,7 @@ exports.postSignIn = (req,res,next) => {
 };
 
 exports.verifyToken = (req,res, next) => {
-    console.log("aaaa");
+    
 
     const token = req.headers['x-access-token'];
 
@@ -93,6 +93,7 @@ exports.verifyToken = (req,res, next) => {
             return res.json({msg: "token invalido"});
         }
         req.userId = decoded.id;
+        console.log("pasa pora aqui??");
 
         next();
     })
@@ -118,6 +119,7 @@ exports.isAdmin = (req, res, next) => {
             return res.status(404).json({msg: 'Usted no es el administrador de este torneo'});
 
         }
+        console.log("pasa pora aqui?");
         next();
 
     })

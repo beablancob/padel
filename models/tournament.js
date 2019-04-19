@@ -4,6 +4,10 @@ module.exports = (sequelize, DataTypes) => {
     name: {type: DataTypes.STRING,
           allowNull: false
     },
+    adminId: {
+      type: DataTypes.INTEGER,
+      allowNull:false
+    },
     numberCouples: {type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 0
@@ -24,13 +28,23 @@ module.exports = (sequelize, DataTypes) => {
     type: DataTypes.BOOLEAN,
     defaultValue:false
 
+  },
+  numeroRondas: {
+    type:DataTypes.INTEGER,
+    defaultValue:1
+  },
+  parejasSuben: {
+    type:DataTypes.INTEGER,
+    defaultValue:0
   }
 
   }, {});
   tournament.associate = function(models) {
     // associations can be defined here
     tournament.belongsTo(models.user, {foreignKey: 'adminId'});
-    tournament.hasMany(models.couple, {foreignKey: 'tournamentId'})
+    tournament.hasMany(models.couple, {foreignKey: 'tournamentId'});
+    tournament.hasMany(models.ronda, {foreignKey: 'tournamentId' });
+
 
   };
   return tournament;

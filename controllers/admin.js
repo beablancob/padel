@@ -161,3 +161,18 @@ exports.deleteCouple = (req, res, next) => {
     .catch(err => console.log(err));
 };
 
+exports.editTournament = async (req, res, next) => {
+
+    const t = await tournament.findById(req.params.tournamentId);
+
+    if(t.rondaActual == 0){
+        t.update({
+            name: req.body.name 
+        })
+    }else {
+        return res.json("El torneo ya está en curso");
+    }
+    
+    return res.json({tournament: t});
+
+};
