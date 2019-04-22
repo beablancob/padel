@@ -48,6 +48,9 @@ module.exports = {
       },
       puntos: {
         type:Sequelize.INTEGER
+      },
+      grupoActual: {
+        type:Sequelize.INTEGER
       }
 
 

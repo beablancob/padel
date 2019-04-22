@@ -43,7 +43,11 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       defaultValue: 0
  
-     } 
+     },
+     grupoActual: {
+       type:DataTypes.INTEGER,
+       
+     }
 
     
   }, {});
