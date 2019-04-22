@@ -26,28 +26,36 @@ module.exports = {
         type: Sequelize.DATE
       },
       partidosJugados: {
-        type:Sequelize.INTEGER
+        type:Sequelize.INTEGER,
+        defaultValue:0
       },
       partidosGanados: {
-        type:Sequelize.INTEGER
+        type:Sequelize.INTEGER,
+        defaultValue:0
       },
       partidosPerdidos: {
-        type:Sequelize.INTEGER
+        type:Sequelize.INTEGER,
+        defaultValue:0
       },
       setsGanados: {
-        type:Sequelize.INTEGER
+        type:Sequelize.INTEGER,
+        defaultValue:0
       },
       setsPerdidos: {
-        type:Sequelize.INTEGER
+        type:Sequelize.INTEGER,
+        defaultValue:0
       },
       juegosGanados: {
-        type:Sequelize.INTEGER
+        type:Sequelize.INTEGER,
+        defaultValue:0
       },
       juegosPerdidos: {
-        type:Sequelize.INTEGER
+        type:Sequelize.INTEGER,
+        defaultValue:0
       },
       puntos: {
-        type:Sequelize.INTEGER
+        type:Sequelize.INTEGER,
+        defaultValue:0
       },
       grupoActual: {
         type:Sequelize.INTEGER

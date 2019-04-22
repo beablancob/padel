@@ -27,6 +27,52 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 
+// tournament.findOne()
+// .then(tournament => {
+//   tournament.getCouples().then(
+//     couples => {
+//       console.log(JSON.stringify(couples).split("},{"));
+//     }
+//   )
+  
+// }
+
+//)
+
+ async function  perro(){
+  const tourney = await tournament.findById(1);
+
+ const result = await couple.findAndCountAll(
+    {
+      where: 
+     { tournamentId: 1}
+    }
+  );
+  const couples = await result.rows;
+  const numero = await result.count;
+
+  console.log(JSON.stringify(couples).split("},{"));
+  console.log(numero);
+
+  let i = 1;
+  let j = 0;
+
+  for(c of couples) {
+   console.log(c.id);
+    
+    
+  }
+
+
+
+
+
+  
+
+};
+
+perro();
+
 
 
 

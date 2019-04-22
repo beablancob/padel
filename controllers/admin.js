@@ -176,3 +176,10 @@ exports.editTournament = async (req, res, next) => {
     return res.json({tournament: t});
 
 };
+
+exports.startTournament = async (req, res, next) => {
+
+    const t = await tournament.findById(req.params.tournamentId);
+
+    
+};
