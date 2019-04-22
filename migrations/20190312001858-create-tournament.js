@@ -14,6 +14,10 @@ module.exports = {
       numberCouples: {
         type: Sequelize.INTEGER
       },
+      parejasPorGrupo: {
+        type: Sequelize.INTEGER,
+        defaultValue:2
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

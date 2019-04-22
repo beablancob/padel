@@ -8,9 +8,10 @@ var logger = require('morgan');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var authRouter = require('./routes/auth');
-var adminRouter = require('./routes/admin')
+var adminRouter = require('./routes/admin');
+var Combinatorics = require('js-combinatorics');
 
-const {user, tournament, couple} = require('./models/index');
+const {user, tournament, couple, partido} = require('./models/index');
 
 
 
@@ -39,39 +40,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 //)
 
- async function  perro(){
-  const tourney = await tournament.findById(1);
 
- const result = await couple.findAndCountAll(
-    {
-      where: 
-     { tournamentId: 1}
-    }
-  );
-  const couples = await result.rows;
-  const numero = await result.count;
-
-  console.log(JSON.stringify(couples).split("},{"));
-  console.log(numero);
-
-  let i = 1;
-  let j = 0;
-
-  for(c of couples) {
-   console.log(c.id);
-    
-    
-  }
-
-
-
-
-
-  
-
-};
-
-perro();
 
 
 
@@ -84,16 +53,20 @@ app.post('/signin', authRouter);
 
 app.post('/signup', authRouter);
 
+// Eliminar pareja de un torneo
+
+app.delete('/admin/tournament/:tournamentId/deleteCouple/:coupleId', adminRouter);
+
+// Dar comienzo a un torneo
+
+app.put('/admin/tournament/:tournamentId/start')
+
 //Editar torneo que soy admin si no esta empezado
 
 app.put('/admin/tournament/:tournamentId/edit', adminRouter);
 
 //Añadir pareja a un torneo
 app.put('/admin/tournament/:tournamentId/addCouple', adminRouter);
-
-// Eliminar pareja de un torneo
-
-app.delete('/admin/tournament/:tournamentId/deleteCouple/:coupleId', adminRouter);
 
 
 

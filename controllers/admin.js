@@ -179,7 +179,56 @@ exports.editTournament = async (req, res, next) => {
 
 exports.startTournament = async (req, res, next) => {
 
-    const t = await tournament.findById(req.params.tournamentId);
+    
+       const tourney = await tournament.findById(req.params.tournamentId);
+      
+       const result = await couple.findAndCountAll(
+          {
+            where: 
+           { tournamentId: 1}
+          }
+        );
+        const couples = await result.rows;
+        const numeroParejas = await result.count;
+      
+        
+        //console.log(Object.keys(couples).length);
+        
+        let j = 0;
+      
+        while( Object.keys(couples).length > 0){
+          console.log("aaa");
+          
+          parejas = couples.slice(0, tourney.parejasPorGrupo);
+          //console.log(parejas);
+          cmb = Combinatorics.combination(parejas,2);
+          while(a = cmb.next()){
+            console.log(a[0].id, a[1].id);
+            partido.create({
+              numeroRonda:0,
+              numeroGrupo:j,
+              couple1Id:a[0].id,
+              couple2Id:a[1].id
+      
+      
+            }).then(p => {
+              tourney.addPartido(p).then(result => {
+                console.log("Partido añadido");
+              }
+      
+              )
+            })
+          }
+          j++;
+          for (let i = 0; i < tourney.parejasPorGrupo; i++){
+          couples.shift();
+          
+          }
+        
+        
+        
+      
+      };
 
     
 };

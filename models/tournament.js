@@ -12,6 +12,11 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       defaultValue: 0
     }
+   ,
+  parejasPorGrupo: {type: DataTypes.INTEGER,
+    allowNull: false,
+    defaultValue: 2
+  }
   ,
   puntosPG: {type: DataTypes.INTEGER,
     allowNull: false,

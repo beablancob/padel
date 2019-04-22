@@ -18,7 +18,8 @@ module.exports = {
    [{
      name: 'torneo de test 1',
      adminId: 1,
-     numberCouples:4,
+     numberCouples:6,
+     parejasPorGrupo:3,
      puntosPG:2,
      puntosPP:1,
      rondaActual:0,

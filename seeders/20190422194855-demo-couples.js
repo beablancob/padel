@@ -46,6 +46,22 @@ module.exports = {
       updatedAt: new Date()
  
      },
+     {
+      user1Id:9,
+      user2Id:10,
+      tournamentId: 1,
+      createdAt: new Date(),
+      updatedAt: new Date()
+ 
+     },
+     {
+      user1Id:11,
+      user2Id:12,
+      tournamentId: 1,
+      createdAt: new Date(),
+      updatedAt: new Date()
+ 
+     }
 
 
    ])
