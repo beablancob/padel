@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
-const {user, tournament, couple} = require('../models/index');
+const Combinatorics = require('js-combinatorics');
+const {user, tournament, couple, partido} = require('../models/index');
 
 //Crear torneo
 exports.postTournament = (req,res,next) => {
@@ -181,11 +182,20 @@ exports.startTournament = async (req, res, next) => {
 
     
        const tourney = await tournament.findById(req.params.tournamentId);
+
+       if(tourney.rondaActual != 0) {
+           return res.status(400).json({error: "el torneo ya está empezado"});
+           
+       }
+
+       tourney.rondaActual=1;
+       tourney.save();
+       console.log(tourney.rondaActual);
       
        const result = await couple.findAndCountAll(
           {
             where: 
-           { tournamentId: 1}
+           { tournamentId: tourney.id}
           }
         );
         const couples = await result.rows;
@@ -203,8 +213,10 @@ exports.startTournament = async (req, res, next) => {
           //console.log(parejas);
           cmb = Combinatorics.combination(parejas,2);
           while(a = cmb.next()){
-            console.log(a[0].id, a[1].id);
-            partido.create({
+            //console.log(a[0].id, a[1].id);
+            if(tourney.idaYvuelta == false){
+
+           await partido.create({
               numeroRonda:0,
               numeroGrupo:j,
               couple1Id:a[0].id,
@@ -218,17 +230,48 @@ exports.startTournament = async (req, res, next) => {
       
               )
             })
+        } else {
+
+          await  partido.bulkCreate([{
+                numeroRonda:0,
+                numeroGrupo:j,
+                couple1Id:a[0].id,
+                couple2Id:a[1].id
+        
+        
+              },
+            {
+                numeroRonda:0,
+                numeroGrupo:j,
+                couple1Id:a[1].id,
+                couple2Id:a[0].id 
+            }]).then(p => {
+                tourney.addPartidos(p).then(result => {
+                  console.log("Partido añadido");
+                }
+        
+                )
+              })
+
+        }
           }
           j++;
           for (let i = 0; i < tourney.parejasPorGrupo; i++){
           couples.shift();
           
           }
-        
-        
-        
+
       
       };
+
+      tourney.getPartidos()
+        .then((partidos) => {
+            return res.status(200).json({partidos: partidos});
+
+        }).catch(err => {
+            return res.status(500).json({error: err});
+
+        })
 
     
 };

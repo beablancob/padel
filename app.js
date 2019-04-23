@@ -59,7 +59,7 @@ app.delete('/admin/tournament/:tournamentId/deleteCouple/:coupleId', adminRouter
 
 // Dar comienzo a un torneo
 
-app.put('/admin/tournament/:tournamentId/start')
+app.put('/admin/tournament/:tournamentId/start', adminRouter);
 
 //Editar torneo que soy admin si no esta empezado
 
