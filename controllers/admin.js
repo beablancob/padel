@@ -217,7 +217,7 @@ exports.startTournament = async (req, res, next) => {
             if(tourney.idaYvuelta == false){
 
            await partido.create({
-              numeroRonda:0,
+              numeroRonda:1,
               numeroGrupo:j,
               couple1Id:a[0].id,
               couple2Id:a[1].id
@@ -233,7 +233,7 @@ exports.startTournament = async (req, res, next) => {
         } else {
 
           await  partido.bulkCreate([{
-                numeroRonda:0,
+                numeroRonda:1,
                 numeroGrupo:j,
                 couple1Id:a[0].id,
                 couple2Id:a[1].id
@@ -241,7 +241,7 @@ exports.startTournament = async (req, res, next) => {
         
               },
             {
-                numeroRonda:0,
+                numeroRonda:1,
                 numeroGrupo:j,
                 couple1Id:a[1].id,
                 couple2Id:a[0].id 
@@ -275,3 +275,29 @@ exports.startTournament = async (req, res, next) => {
 
     
 };
+
+// exports.nextRoundTournament() = async (req,res,next) => {
+
+//     let grupos = [];
+//     const tourney = await tournament.findById(req.params.tournamentId);
+//     const partidosRondaActual = await tournament.getPartidos({
+//         where: {
+//         numeroRonda: tourney.rondaActual
+//         }
+//     });
+
+//     // Comprobar que se han jugado todos los partidos de la ronda para avanzar a la siguiente
+//     for(p of partidosRondaActual){
+//         if (p.ganador == null){
+//             return res.status(400).json({error: "Quedan partidos por jugar esta ronda"});
+//         }
+//         if(grupos.indexOf(p.numeroGrupo) === -1){
+//             grupos.push(p.numeroGrupo);
+//         }
+
+//     }
+
+//     const parejas = await tournament.getCouples();
+  
+
+// };

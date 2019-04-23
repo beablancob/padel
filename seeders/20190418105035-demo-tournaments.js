@@ -23,7 +23,7 @@ module.exports = {
      puntosPG:2,
      puntosPP:1,
      rondaActual:0,
-     idaYvuelta:true,
+     idaYvuelta:false,
      numeroRondas:4,
      parejasSuben:2,
      createdAt: new Date(),
