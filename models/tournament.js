@@ -48,7 +48,6 @@ module.exports = (sequelize, DataTypes) => {
     // associations can be defined here
     tournament.belongsTo(models.user, {foreignKey: 'adminId'});
     tournament.hasMany(models.couple, {foreignKey: 'tournamentId'});
-    tournament.hasMany(models.ronda, {foreignKey: 'tournamentId' });
     tournament.hasMany(models.partido,{foreignKey: 'tournamentId' } );
 
 

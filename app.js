@@ -43,7 +43,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 //)
 
-async function  perro() {
+async function  aaaa() {
     let grupos = [];
     const tourney = await tournament.findById(1);
     const partidosRondaActual = await tourney.getPartidos({
@@ -99,7 +99,7 @@ async function  perro() {
     
 };
 
-perro();
+aaaa();
 
 
 

@@ -67,7 +67,7 @@ exports.postSignIn = (req,res,next) => {
 
         });
 
-        res.json({authenticated: true, accessToken: token});
+        res.json({authenticated: true, token: token});
 
 
     })
