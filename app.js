@@ -43,63 +43,63 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 //)
 
-async function  aaaa() {
-    let grupos = [];
-    const tourney = await tournament.findById(1);
-    const partidosRondaActual = await tourney.getPartidos({
-        where: {
-        numeroRonda: tourney.rondaActual
-        }
-    });
+// async function  aaaa() {
+//     let grupos = [];
+//     const tourney = await tournament.findById(1);
+//     const partidosRondaActual = await tourney.getPartidos({
+//         where: {
+//         numeroRonda: tourney.rondaActual
+//         }
+//     });
 
-    // Comprobar que se han jugado todos los partidos de la ronda para avanzar a la siguiente
-    for(p of partidosRondaActual){
-        if (p.ganador == null){
-            return res.status(400).json({error: "Quedan partidos por jugar esta ronda"});
-        }
-        if(grupos.indexOf(p.numeroGrupo) === -1){
-            grupos.push(p.numeroGrupo);
+//     // Comprobar que se han jugado todos los partidos de la ronda para avanzar a la siguiente
+//     for(p of partidosRondaActual){
+//         if (p.ganador == null){
+//             return res.status(400).json({error: "Quedan partidos por jugar esta ronda"});
+//         }
+//         if(grupos.indexOf(p.numeroGrupo) === -1){
+//             grupos.push(p.numeroGrupo);
             
-        }
-    }
-    //console.log(grupos);
-    //Todas las parejas del torneo
-    const parejas = await tourney.getCouples();
-    //console.log(Object.keys(parejas).length);
-    for (pareja of parejas){
+//         }
+//     }
+//     //console.log(grupos);
+//     //Todas las parejas del torneo
+//     const parejas = await tourney.getCouples();
+//     //console.log(Object.keys(parejas).length);
+//     for (pareja of parejas){
 
-      const partidosPareja = await partido.findAll({
-        where:
-        {
-          [Op.or]: [{couple1Id:pareja.id}, {couple2Id:pareja.id}]
-        }
-       });
+//       const partidosPareja = await partido.findAll({
+//         where:
+//         {
+//           [Op.or]: [{couple1Id:pareja.id}, {couple2Id:pareja.id}]
+//         }
+//        });
 
-       //Sumar los puntos de esta ronda a los puntos de la pareja
-       let puntos = pareja.puntos;
-       console.log(puntos);
-       for (p of partidosPareja){
-        // console.log(p.ganador);
-         //console.log(pareja)
-         if(p.ganador === pareja.id){
-           puntos = puntos +  tourney.puntosPG;
+//        //Sumar los puntos de esta ronda a los puntos de la pareja
+//        let puntos = pareja.puntos;
+//        console.log(puntos);
+//        for (p of partidosPareja){
+//         // console.log(p.ganador);
+//          //console.log(pareja)
+//          if(p.ganador === pareja.id){
+//            puntos = puntos +  tourney.puntosPG;
 
-         }else{
-           puntos = puntos + tourney.puntosPP;
-         }
-       }
-       console.log(puntos);
-        pareja.puntos = puntos;
-       await pareja.save();
-      //  console.log(p.id, partidosPareja[0].couple1Id, partidosPareja[0].couple2Id);
-      //  console.log(p.id, partidosPareja[1].couple1Id, partidosPareja[1].couple2Id);
-    }
+//          }else{
+//            puntos = puntos + tourney.puntosPP;
+//          }
+//        }
+//        console.log(puntos);
+//         pareja.puntos = puntos;
+//        await pareja.save();
+//       //  console.log(p.id, partidosPareja[0].couple1Id, partidosPareja[0].couple2Id);
+//       //  console.log(p.id, partidosPareja[1].couple1Id, partidosPareja[1].couple2Id);
+//     }
 
-    //Una vez añadidos los puntos ordenar los grupos previos con la puntuacion de ahora
+//     //Una vez añadidos los puntos ordenar los grupos previos con la puntuacion de ahora
     
-};
+// };
 
-aaaa();
+// aaaa();
 
 
 
