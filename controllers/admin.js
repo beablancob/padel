@@ -184,13 +184,25 @@ exports.startTournament = async (req, res, next) => {
        const tourney = await tournament.findById(req.params.tournamentId);
 
        if(tourney.rondaActual != 0) {
-           return res.status(400).json({error: "el torneo ya está empezado"});
+           return res.status(500).json({error: "El torneo ya está empezado"});
            
        }
 
        tourney.rondaActual=1;
        tourney.save();
        console.log(tourney.rondaActual);
+
+       if(order != null){
+           let couples = null;
+           for(id of order)
+           {
+               let pareja = null;
+               pareja = await couple.findById(id);
+               couples.push(pareja);
+           }
+           const numeroParejas = await Object.keys(couples).length;
+
+       }else{
       
        const result = await couple.findAndCountAll(
           {
@@ -199,8 +211,12 @@ exports.startTournament = async (req, res, next) => {
           }
         );
         const couples = await result.rows;
+
+        
         const numeroParejas = await result.count;
-      
+
+
+        }
         
         //console.log(Object.keys(couples).length);
         
