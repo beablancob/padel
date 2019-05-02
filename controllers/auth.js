@@ -54,7 +54,7 @@ exports.postSignIn = (req,res,next) => {
     .then(user => {
 
         if (!user){
-            res.status(404).json({msg:"el correo no existe"});
+           return res.status(404).json({msg:"el correo no existe"});
         }
         
         const validPassword = bcrypt.compareSync(req.body.password, user.password);
@@ -62,7 +62,7 @@ exports.postSignIn = (req,res,next) => {
             return res.json({msg: "Contraseña incorrecta"});
         }
 
-        const token = jwt.sign({id: user.id}, "secreto", {
+        const token = jwt.sign({user: user}, "secreto", {
             expiresIn: 24 * 60 * 1000
 
         });
@@ -92,7 +92,7 @@ exports.verifyToken = (req,res, next) => {
         if(err){
             return res.json({msg: "token invalido"});
         }
-        req.userId = decoded.id;
+        req.userId = decoded.user.id;
         console.log("pasa pora aqui??");
 
         next();

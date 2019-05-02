@@ -192,13 +192,18 @@ exports.startTournament = async (req, res, next) => {
        tourney.save();
        console.log(tourney.rondaActual);
 
+       // Si le pasamos el orden de los grupos ejecuta el if sino el else
+       let order = req.body.order;
+       //console.log(order);
+       let couples = [];
        if(order != null){
-           let couples = null;
+           
            for(id of order)
            {
                let pareja = null;
                pareja = await couple.findById(id);
-               couples.push(pareja);
+               await couples.push(pareja);
+            
            }
            const numeroParejas = await Object.keys(couples).length;
 
@@ -210,20 +215,20 @@ exports.startTournament = async (req, res, next) => {
            { tournamentId: tourney.id}
           }
         );
-        const couples = await result.rows;
+         couples = await result.rows;
 
         
         const numeroParejas = await result.count;
 
 
         }
-        
-        //console.log(Object.keys(couples).length);
+        console.log(couples[2].id);
+        console.log(Object.keys(couples).length);
         
         let j = 0;
-      
+        
         while( Object.keys(couples).length > 0){
-          console.log("aaa");
+          //console.log("aaa");
           
           parejas = couples.slice(0, tourney.parejasPorGrupo);
           //console.log(parejas);
