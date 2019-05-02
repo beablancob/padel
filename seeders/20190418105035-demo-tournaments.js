@@ -22,7 +22,7 @@ module.exports = {
      parejasPorGrupo:3,
      puntosPG:2,
      puntosPP:1,
-     rondaActual:0,
+     rondaActual:1,
      idaYvuelta:false,
      numeroRondas:4,
      parejasSuben:2,

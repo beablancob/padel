@@ -29,6 +29,24 @@ module.exports = {
       ganador: {
         type: Sequelize.INTEGER
       },
+      set1Couple1: {
+        type: Sequelize.INTEGER
+      },
+      set2Couple1: {
+        type: Sequelize.INTEGER
+      },
+      set3Couple1: {
+        type: Sequelize.INTEGER
+      },
+      set1Couple2: {
+        type: Sequelize.INTEGER
+      },
+      set2Couple2: {
+        type: Sequelize.INTEGER
+      },
+      set3Couple2: {
+        type: Sequelize.INTEGER
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

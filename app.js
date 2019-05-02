@@ -62,44 +62,133 @@ app.use(express.static(path.join(__dirname, 'public')));
             
 //         }
 //     }
-//     //console.log(grupos);
-//     //Todas las parejas del torneo
-//     const parejas = await tourney.getCouples();
-//     //console.log(Object.keys(parejas).length);
-//     for (pareja of parejas){
+//     console.log(grupos);
 
-//       const partidosPareja = await partido.findAll({
-//         where:
-//         {
-//           [Op.or]: [{couple1Id:pareja.id}, {couple2Id:pareja.id}]
+//     for (g of grupos){
+//       const parejas = await tourney.getCouples({
+//         where: {
+//           grupoActual: g
 //         }
-//        });
-
-//        //Sumar los puntos de esta ronda a los puntos de la pareja
-//        let puntos = pareja.puntos;
-//        console.log(puntos);
-//        for (p of partidosPareja){
-//         // console.log(p.ganador);
-//          //console.log(pareja)
-//          if(p.ganador === pareja.id){
-//            puntos = puntos +  tourney.puntosPG;
-
-//          }else{
-//            puntos = puntos + tourney.puntosPP;
-//          }
-//        }
-//        console.log(puntos);
-//         pareja.puntos = puntos;
-//        await pareja.save();
-//       //  console.log(p.id, partidosPareja[0].couple1Id, partidosPareja[0].couple2Id);
-//       //  console.log(p.id, partidosPareja[1].couple1Id, partidosPareja[1].couple2Id);
+//       });
+      
 //     }
 
-//     //Una vez añadidos los puntos ordenar los grupos previos con la puntuacion de ahora
     
-// };
+    //Todas las parejas del torneo
+    // const parejas = await tourney.getCouples({
+    //   where: {}
+    // });
 
-// aaaa();
+    // //console.log(Object.keys(parejas).length);
+    // for (pareja of parejas){
+
+    //   const partidosPareja = await partido.findAll({
+    //     where:
+    //     {
+    //       [Op.or]: [{couple1Id:pareja.id}, {couple2Id:pareja.id}]
+    //     }
+    //    });
+
+    //    //Sumar los puntos de esta ronda a los puntos de la pareja
+    //    let puntos = pareja.puntos;
+    //    console.log(puntos);
+    //    for (p of partidosPareja){
+    //     // console.log(p.ganador);
+    //      //console.log(pareja)
+    //      if(p.ganador === pareja.id){
+    //        puntos = puntos +  tourney.puntosPG;
+
+    //      }else{
+    //        puntos = puntos + tourney.puntosPP;
+    //      }
+    //    }
+    //    console.log(puntos);
+    //     pareja.puntos = puntos;
+    //    await pareja.save();
+    //   //  console.log(p.id, partidosPareja[0].couple1Id, partidosPareja[0].couple2Id);
+    //   //  console.log(p.id, partidosPareja[1].couple1Id, partidosPareja[1].couple2Id);
+    // }
+
+    //Una vez añadidos los puntos ordenar los grupos previos con la puntuacion de ahora
+    
+//};
+
+//aaaa();
+
+//Editar resultado
+
+async function editarResultado(){
+  
+  const tourney = await tournament.findById(1);
+  const partidos = await tourney.getPartidos({
+    where: {
+      //id del partido req.body.partidoId
+      id: 1
+    }
+  });
+  //console.log(partido[0].numeroRonda);
+  const partido = partidos[0];
+  //req.body.sets
+  sets = [6,4,5,3,6,7];
+  
+  //Impedir modificacion si ya se avanzo de ronda
+  if(tourney.rondaActual != partido.numeroRonda){
+    return res.status(400).json({error: "No puedes modificar resultado de una ronda ya pasada"})
+  }
+
+  //Obtener los sets del body y añadirselos al partido
+  //Comprobar que hay 6 sets y que ninguno es nulo
+  if(Object.keys(sets).length != 6){
+    res.status(400).json({error: "El numero de sets total no es correcto"})
+  }
+
+  for(set of sets) {
+    if(set == null ){
+      return res.status(400).json({error: "Error en un set"});
+    }
+
+  }
+
+  let juegospareja1 = sets[0]+sets[1]+sets[2];
+  let juegospareja2 = sets[3]+sets[4]+sets[5];
+
+  if(juegospareja1 === juegospareja2){
+    return res.status(400).json({error: "Error en los juegos introducidos"})
+  }
+  
+  //Sets pareja 1
+  set1Couple1 = sets[0];
+  set2Couple1 = sets[1];
+  set3Couple1 = sets[2];
+  //Sets pareja 2
+  set1Couple2 = sets[3];
+  set2Couple2 = sets[4];
+  set3Couple2 = sets[5];
+
+  //Actualizar resultados
+  partido.set1Couple1 = set1Couple1;
+  partido.set2Couple1 = set2Couple1;
+  partido.set3Couple1 = set3Couple1;
+  partido.set1Couple2 = set1Couple2;
+  partido.set2Couple2 = set2Couple2;
+  partido.set3Couple2 = set3Couple2;
+  
+  //Vemos quien gana
+  
+  if(juegospareja1 > juegospareja2){
+    partido.ganador = partido.couple1Id;
+
+  }else {
+    partido.ganador = partido.couple2Id;
+  }
+  partido.jugado = true;
+
+  await partido.save();
+
+};
+
+//editarResultado();
+
 
 
 
@@ -113,6 +202,9 @@ app.post('/signin', authRouter);
 //REGISTRO
 
 app.post('/signup', authRouter);
+
+//Editar resultado de un partido
+app.put('/admin/tournament/:tournamentId/partido/:partidoId/edit', adminRouter);
 
 // Eliminar pareja de un torneo
 
