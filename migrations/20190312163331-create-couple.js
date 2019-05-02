@@ -59,6 +59,14 @@ module.exports = {
       },
       grupoActual: {
         type:Sequelize.INTEGER
+      },
+      diferenciaSets: {
+        type:Sequelize.INTEGER,
+        defaultValue:0
+      },
+      diferenciaJuegos:{
+        type:Sequelize.INTEGER,
+        defaultValue:0
       }
 
 

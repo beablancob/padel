@@ -4,6 +4,7 @@ const router = express.Router();
 const authController = require('../controllers/auth');
 const adminController = require('../controllers/admin');
 
+//Editar resultado de un partido si soy admin de la ronda en curso
 router.put('/admin/tournament/:tournamentId/partido/:partidoId/edit', authController.verifyToken, authController.isAdmin, adminController.editResult);
 
 //Iniciar primera ronda que soy admin

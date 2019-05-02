@@ -190,7 +190,7 @@ exports.startTournament = async (req, res, next) => {
 
        tourney.rondaActual=1;
        tourney.save();
-       console.log(tourney.rondaActual);
+       //console.log(tourney.rondaActual);
 
        // Si le pasamos el orden de los grupos ejecuta el if sino el else
        let order = req.body.order;
@@ -222,8 +222,8 @@ exports.startTournament = async (req, res, next) => {
 
 
         }
-        console.log(couples[2].id);
-        console.log(Object.keys(couples).length);
+        //console.log(couples[2].id);
+        //console.log(Object.keys(couples).length);
         
         let j = 0;
         
@@ -322,7 +322,7 @@ exports.editResult = async (req, res, next) => {
     return res.status(400).json({error: "No puedes modificar resultado de una ronda ya pasada"})
   }
 
-
+  //Cogemos los sets de la request
   const sets = req.body.sets;
 
   //Obtener los sets del body y añadirselos al partido
@@ -363,18 +363,22 @@ exports.editResult = async (req, res, next) => {
   partido.set1Couple2 = set1Couple2;
   partido.set2Couple2 = set2Couple2;
   partido.set3Couple2 = set3Couple2;
-  
+    
   //Vemos quien gana
+
   
   if(juegospareja1 > juegospareja2){
     partido.ganador = partido.couple1Id;
+    
 
   }else {
     partido.ganador = partido.couple2Id;
   }
+  
   partido.jugado = true;
-
+  //Una vez añadido el resultado lo guardamos en la bbdd
   await partido.save();
+
  //Devolvemos el partido
   return res.status(200).json({partido: partido})
 

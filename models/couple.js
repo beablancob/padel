@@ -47,6 +47,14 @@ module.exports = (sequelize, DataTypes) => {
      grupoActual: {
        type:DataTypes.INTEGER,
        
+     },
+     diferenciaSets:{
+       type:DataTypes.INTEGER,
+       defaultValue:0
+     },
+     diferenciaJuegos:{
+       type:DataTypes.INTEGER,
+       defaultValue:0
      }
 
     
