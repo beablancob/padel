@@ -45,6 +45,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 async function  aaaa() {
     let grupos = [];
+    //req.params.tournamentId
     const tourney = await tournament.findById(1);
     const partidosRondaActual = await tourney.getPartidos({
         where: {
@@ -55,7 +56,7 @@ async function  aaaa() {
     // Comprobar que se han jugado todos los partidos de la ronda para avanzar a la siguiente
     for(p of partidosRondaActual){
         if (p.ganador == null){
-            //return res.status(400).json({error: "Quedan partidos por jugar esta ronda"});
+            return res.status(400).json({error: "Quedan partidos por jugar esta ronda"});
         }
         if(grupos.indexOf(p.numeroGrupo) === -1){
             grupos.push(p.numeroGrupo);
@@ -63,6 +64,10 @@ async function  aaaa() {
         }
     }
     console.log(grupos);
+    
+    if(tourney.rondaActual == 0 || tourney.rondaActual == tourney.numeroRondas){
+      return res.status(400).json({error: "El torneo aun no ha comenzado o está en la ultima ronda"});
+    }
 
     //Actualizamos todas los puntos y los juegos de las parejas del torneo
     const parejas = await tourney.getCouples({});
@@ -365,14 +370,17 @@ async function  aaaa() {
 
     //Devolvems los partidos de la ronda siguiente
 
-  // tourney.getPartidos()
-  //   .then((partidos) => {
-  //       return res.status(200).json({partidos: partidos});
+    tourney.getPartidos({where:
+    {
+      numeroRonda: tourney.rondaActual
+    }})
+    .then((partidos) => {
+        return res.status(200).json({partidos: partidos});
 
-  //   }).catch(err => {
-  //       return res.status(500).json({error: err});
+    }).catch(err => {
+        return res.status(500).json({error: err});
 
-  //   })
+    })
 
 
 
