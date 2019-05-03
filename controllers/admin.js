@@ -552,6 +552,7 @@ exports.nextRound = async (req,res,next) => {
 
        await couplePreviousRound.create({
            coupleId: pareja.id,
+           tournamentId: tourney.id,
            round: tourney.rondaActual,
            partidosJugados: pareja.partidosJugados,
            partidosGanados: pareja.partidosGanados,
@@ -769,6 +770,68 @@ exports.nextRound = async (req,res,next) => {
   
 
 };
+
+exports.previousRounds = async (req,res,next) => {
+
+    
+  tourney = await tournament.findById(req.params.tournamentId);
+
+  let clasificacion = [];
+  let grupos = [];
+  for(let nRonda= 1; nRonda < tourney.rondaActual; nRonda++){
+  
+  
+
+  parejasAnteriores = await tourney.getCouplePreviousRounds();
+
+  //Cogemos los grupos de esa ronda
+  for(p of parejasAnteriores){
+    if(grupos.indexOf(p.grupo) === -1){
+      grupos.push(p.grupo);
+  
+  }
+  }
+  
+
+  //Ordenamos los grupos, orden ascendente
+  grupos =  grupos.sort((a,b) => a-b);
+  //console.log(grupos);
+
+  
+  clasificacion[nRonda] = [];
+  for(g of grupos){
+   
+    parejasGrupo = await tourney.getCouplePreviousRounds({where:
+      {round: nRonda,
+        grupo: g},
+        order: [
+          ['puntos', 'DESC'],
+          ['diferenciaSets', 'DESC'],
+          ['diferenciaJuegos', 'DESC']
+        ]
+      
+    });
+
+    partidosGrupo = await tourney.getPartidos({where:{
+      numeroRonda:nRonda,
+      numeroGrupo:g
+    }});
+
+
+    
+    clasificacion[nRonda][g]=[];
+    clasificacion[nRonda][g].push(parejasGrupo);
+    clasificacion[nRonda][g].push(partidosGrupo);
+    console.log(clasificacion[nRonda]);
+
+  }
+
+}
+
+return res.status(200).json({clasificacion: clasificacion});
+
+
+}
 
 
 

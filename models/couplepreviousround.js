@@ -3,6 +3,7 @@ module.exports = (sequelize, DataTypes) => {
   const couplePreviousRound = sequelize.define('couplePreviousRound', {
     round: DataTypes.INTEGER,
     coupleId: DataTypes.INTEGER,
+    tournamentId: DataTypes.INTEGER,
     partidosJugados: DataTypes.INTEGER,
     partidosGanados: DataTypes.INTEGER,
     partidosPerdidos: DataTypes.INTEGER,
@@ -18,6 +19,8 @@ module.exports = (sequelize, DataTypes) => {
   couplePreviousRound.associate = function(models) {
     // associations can be defined here
     couplePreviousRound.belongsTo(models.couple, {foreignKey: 'coupleId'});
+    couplePreviousRound.belongsTo(models.tournament, {foreignKey: 'tournamentId'});
+
   };
   return couplePreviousRound;
 };

@@ -7,6 +7,9 @@ const adminController = require('../controllers/admin');
 //Editar resultado de un partido si soy admin de la ronda en curso
 router.put('/admin/tournament/:tournamentId/partido/:partidoId/edit', authController.verifyToken, authController.isAdmin, adminController.editResult);
 
+//Obtener rondas anteriores
+router.get('/admin/tournament/:tournamentId/previousRounds', authController.verifyToken, authController.isAdmin, adminController.previousRounds);
+
 //Iniciar primera ronda que soy admin
 router.put('/admin/tournament/:tournamentId/start',authController.verifyToken, authController.isAdmin, adminController.startTournament)
 

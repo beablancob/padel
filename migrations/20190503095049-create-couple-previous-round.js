@@ -14,6 +14,9 @@ module.exports = {
       coupleId: {
         type: Sequelize.INTEGER
       },
+      tournamentId: {
+        type: Sequelize.INTEGER
+      },
       partidosJugados: {
         type: Sequelize.INTEGER
       },

@@ -45,6 +45,65 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 async function  aaaa() {
 
+  //req.params.tournamentId
+  tourney = await tournament.findById(req.params.tournamentId);
+
+  let clasificacion = [];
+  for(let nRonda= 1; nRonda < tourney.rondaActual; nRonda++){
+  
+  let grupos = [];
+
+  parejasAnteriores = await tourney.getCouplePreviousRounds();
+
+  //Cogemos los grupos de esa ronda
+  for(p of parejasAnteriores){
+    if(grupos.indexOf(p.grupo) === -1){
+      grupos.push(p.grupo);
+  
+  }
+  }
+  
+
+  //Ordenamos los grupos, orden ascendente
+  grupos =  grupos.sort((a,b) => a-b);
+  //console.log(grupos);
+
+  
+  
+  for(g of grupos){
+   
+    parejasGrupo = await tourney.getCouplePreviousRounds({where:
+      {round: nRonda,
+        grupo: g},
+        order: [
+          ['puntos', 'DESC'],
+          ['diferenciaSets', 'DESC'],
+          ['diferenciaJuegos', 'DESC']
+        ]
+      
+    });
+
+    partidosGrupo = await tourney.getPartidos({where:{
+      numeroRonda:nRonda,
+      numeroGrupo:g
+    }});
+
+    clasificacion[nRonda] = [];
+    clasificacion[nRonda].push(parejasGrupo);
+    clasificacion[nRonda].push(partidosGrupo);
+    console.log(clasificacion[nRonda]);
+
+  }
+
+}
+
+
+  //console.log(parejasAnteriores);
+  //couplesRonda = tourney.getCouplePreviousRounds()
+
+  
+
+
   
 
 
@@ -63,7 +122,7 @@ async function  aaaa() {
     
  
 
- aaaa();
+ //aaaa();
 
 //  async function prueba(){
 
@@ -157,6 +216,10 @@ app.post('/signin', authRouter);
 //REGISTRO
 
 app.post('/signup', authRouter);
+
+//Obtener rondas anteriores
+app.get('/admin/tournament/:tournamentId/previousRounds', adminRouter);
+
 
 //Avanzar ronda
 app.put('/admin/tournament/:tournamentId/nextRound', adminRouter);
