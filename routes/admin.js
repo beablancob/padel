@@ -10,6 +10,8 @@ router.put('/admin/tournament/:tournamentId/partido/:partidoId/edit', authContro
 //Iniciar primera ronda que soy admin
 router.put('/admin/tournament/:tournamentId/start',authController.verifyToken, authController.isAdmin, adminController.startTournament)
 
+//Avanzar ronda
+router.put('/admin/tournament/:tournamentId/nextRound', authController.verifyToken, authController.isAdmin, adminController.nextRound);
 
 //Editar configuracion torneo que soy admin
 
