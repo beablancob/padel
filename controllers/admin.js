@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const Combinatorics = require('js-combinatorics');
-const {user, tournament, couple, partido} = require('../models/index');
+const {user, tournament, couple, partido, couplePreviousRound} = require('../models/index');
 const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
 
@@ -550,6 +550,26 @@ exports.nextRound = async (req,res,next) => {
 
        await pareja.save();
 
+       await couplePreviousRound.create({
+           coupleId: pareja.id,
+           round: tourney.rondaActual,
+           partidosJugados: pareja.partidosJugados,
+           partidosGanados: pareja.partidosGanados,
+           partidosPerdidos: pareja.partidosPerdidos,
+           setsGanados: pareja.setsGanados,
+           setsPerdidos: pareja.setsPerdidos,
+           juegosGanados: pareja.juegosGanados,
+           juegosPerdidos: pareja.juegosPerdidos,
+           puntos: pareja.puntos,
+           grupo: pareja.grupoActual,
+           diferenciaSets: pareja.diferenciaSets,
+           diferenciaJuegos: pareja.diferenciaJuegos
+
+       })
+
+
+
+
     }
 
 
@@ -733,7 +753,7 @@ exports.nextRound = async (req,res,next) => {
       p.save();
   }
 
-    //Devolvems los partidos de la ronda siguiente
+    //Devolvemos los partidos de la ronda siguiente
 
     tourney.getPartidos({where:
     {
@@ -749,5 +769,7 @@ exports.nextRound = async (req,res,next) => {
   
 
 };
+
+
 
 
