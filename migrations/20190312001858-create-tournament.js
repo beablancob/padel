@@ -46,6 +46,10 @@ module.exports = {
         defaultValue:false
     
       },
+      publico: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: true
+      },
       numeroRondas: {
         type: Sequelize.INTEGER,
         defaultValue:0

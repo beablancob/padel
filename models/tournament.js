@@ -18,6 +18,10 @@ module.exports = (sequelize, DataTypes) => {
     defaultValue: 2
   }
   ,
+  publico: { type: DataTypes.BOOLEAN,
+    allowNull:false
+
+  },
   puntosPG: {type: DataTypes.INTEGER,
     allowNull: false,
     defaultValue: 0
