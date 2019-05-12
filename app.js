@@ -45,41 +45,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 async function  aaa(){
 
-        //Cojo parejas en las que estoy
-        const parejasQueEstoy = await couple.findAll({where:{
-            [Op.or]: [{user1Id: 1}, {user2Id: 1}]
-    
-        }
-        });
-        
-        if(parejasQueEstoy.length == 0){
-          return res.status(200).json({msg: "No pertenece a ningún torneo"});
-        }
-
-        let idsTorneos = [];
-
-        //Por cada pareja en la que estoy selecciono el id del torneo al que pertenece 
-        for(p of parejasQueEstoy){
-          idsTorneos.push(p.tournamentId);
-        }
-
-
-        //Busco los torneos en los que estoy con los ids de las parejas de antes
-         const torneosQueEstoy = await tournament.findAll({where:{
-           id:{
-            [Op.or]: [idsTorneos]
-
-           }
-         }
-        });
-
-        console.log(torneosQueEstoy.length);
-
-
 
 }
 
-aaa();
+//aaa();
 
 
 
@@ -133,9 +102,14 @@ app.get('/admin/tournament/:tournamentId',adminRouter);
 
 
 
+//Obtener torneos en los que juego
+app.get('/tournaments/myTournaments', userRouter);
+
 //Obtener torneos publicos que no han empezado
 
 app.get('/tournaments/publicos', userRouter);
+
+
 
 
 

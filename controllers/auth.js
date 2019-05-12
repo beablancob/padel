@@ -93,7 +93,7 @@ exports.verifyToken = (req,res, next) => {
             return res.json({msg: "token invalido"});
         }
         req.userId = decoded.user.id;
-        console.log("pasa pora aqui??");
+        
 
         next();
     })

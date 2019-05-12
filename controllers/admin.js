@@ -180,9 +180,10 @@ exports.editTournament = async (req, res, next) => {
 
 };
 
+//Dar inicia la primera ronda de un torneo
 exports.startTournament = async (req, res, next) => {
 
-    
+
        const tourney = await tournament.findById(req.params.tournamentId);
 
        if(tourney.rondaActual != 0) {
@@ -194,7 +195,7 @@ exports.startTournament = async (req, res, next) => {
        tourney.save();
        //console.log(tourney.rondaActual);
 
-       // Si le pasamos el orden de los grupos ejecuta el if sino el else
+       // Si le pasamos el orden de los grupos ejecuta el if 
        let order = req.body.order;
        //console.log(order);
        let couples = [];
@@ -209,7 +210,7 @@ exports.startTournament = async (req, res, next) => {
            }
            const numeroParejas = await Object.keys(couples).length;
 
-       }else{
+       } else{
       
        const result = await couple.findAndCountAll(
           {
@@ -229,9 +230,11 @@ exports.startTournament = async (req, res, next) => {
         
         let j = 0;
         
+        //Mientras que queden parejas del torneo sin meter en grupo 
         while( Object.keys(couples).length > 0){
           //console.log("aaa");
           
+          //Agrupamos las parejas segun el torneo
           parejas = couples.slice(0, tourney.parejasPorGrupo);
           for (p of parejas){
               p.grupoActual = j;
@@ -240,9 +243,11 @@ exports.startTournament = async (req, res, next) => {
 
           }
           //console.log(parejas);
+          //Usamos el paquete combinator para hacer los partidos
           cmb = Combinatorics.combination(parejas,2);
           while(a = cmb.next()){
             //console.log(a[0].id, a[1].id);
+            //Vemos si el torneo esta puesto a ida y vuelta
             if(tourney.idaYvuelta == false){
 
            await partido.create({
@@ -285,6 +290,8 @@ exports.startTournament = async (req, res, next) => {
         }
           }
           j++;
+
+          //Quitamos las parejas del grupo que hayamos creado de couples y pasamos al siguiente grupo con j++
           for (let i = 0; i < tourney.parejasPorGrupo; i++){
           couples.shift();
           
@@ -293,6 +300,7 @@ exports.startTournament = async (req, res, next) => {
       
       };
 
+      //Devolvemos los partidos de la primera ronda
       tourney.getPartidos()
         .then((partidos) => {
             return res.status(200).json({partidos: partidos});
@@ -358,7 +366,7 @@ exports.editResult = async (req, res, next) => {
   set2Couple2 = sets[4];
   set3Couple2 = sets[5];
 
-  //Actualizar resultados
+  //Actualizar los sets del partidos con los datos de la req
   partido.set1Couple1 = set1Couple1;
   partido.set2Couple1 = set2Couple1;
   partido.set3Couple1 = set3Couple1;
@@ -381,7 +389,7 @@ exports.editResult = async (req, res, next) => {
   //Una vez añadido el resultado lo guardamos en la bbdd
   await partido.save();
 
- //Devolvemos el partido
+ //Devolvemos el partido con los datos actualizados
   return res.status(200).json({partido: partido})
 
 };
@@ -573,7 +581,7 @@ exports.nextRound = async (req,res,next) => {
 
     }
 
-
+    //Ordenamos los grupos segun hayan quedado en esta ronda
     
     let gruposDeParejas = [];
 
@@ -594,6 +602,7 @@ exports.nextRound = async (req,res,next) => {
       
       
       gruposDeParejas[g] = [];
+
       //Meto las parejas de el array de modo que quede gruposDeParejas[g]=[ParejasGrupoG] ordenadas por puntos, diferencia de sets y juegos en caso de empates
       for (p of parejas){
       gruposDeParejas[g].push(p);
@@ -771,6 +780,7 @@ exports.nextRound = async (req,res,next) => {
 
 };
 
+//Rondas pasadas
 exports.previousRounds = async (req,res,next) => {
 
     
@@ -778,6 +788,8 @@ exports.previousRounds = async (req,res,next) => {
 
   let clasificacion = [];
   let grupos = [];
+
+
   for(let nRonda= 1; nRonda < tourney.rondaActual; nRonda++){
   
   
@@ -793,12 +805,14 @@ exports.previousRounds = async (req,res,next) => {
   }
   
 
-  //Ordenamos los grupos, orden ascendente
+  //Ordenamos los grupos, orden ascendente [0,1,2,3..]
   grupos =  grupos.sort((a,b) => a-b);
   //console.log(grupos);
 
   
   clasificacion[nRonda] = [];
+
+  //Vamos cogiendo los resultados de las parejas en rondas anteriores divididos por grupos y los partidos de esas rondas y esos grupos
   for(g of grupos){
    
     parejasGrupo = await tourney.getCouplePreviousRounds({where:
@@ -817,7 +831,8 @@ exports.previousRounds = async (req,res,next) => {
       numeroGrupo:g
     }});
 
-
+    //Por ejemplo metemos en la ronda 1 el grupo 0
+    //Las parejas de ronda 1 y grupo 0 estan en clasificacion[Ronda1][Grupo0][Parejas, Partidos]
     
     clasificacion[nRonda][g]=[];
     clasificacion[nRonda][g].push(parejasGrupo);

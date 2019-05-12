@@ -1,5 +1,6 @@
 const {user, tournament, couple, partido, couplePreviousRound} = require('../models/index');
 const Sequelize = require('sequelize');
+const Op = Sequelize.Op;
 
 
 //Devolver torneos publicos no empezados
@@ -27,17 +28,34 @@ exports.getPublicTournaments = (req, res, next) => {
 };
 
 //Obtener torneos en los que estoy incristo o estoy jugando
-// exports.getPlayingTournaments = async (req, res, next) => {
+ exports.getMyTournaments = async (req, res, next) => {
 
-//     const parejasQueEstoy = couple.findAll({where:{
-//         [Op.or]: [{user1Id: req.userId}, {user2Id: req.userId}]
+//     //Cojo parejas en las que estoy
+const parejasQueEstoy = await couple.findAll({where:{
+    [Op.or]: [{user1Id: 1}, {user2Id: 1}]
 
-//     }
-//     });
+}
+});
 
-    
-//     const torneosQueEstoy = tournament.findAll({where:{
-//         [Op.or]: [{couple1Id: req.userId}, {couple2Id: req.userId}]
+if(parejasQueEstoy.length == 0){
+  return res.status(200).json({msg: "No pertenece a ningún torneo"});
+}
 
-//     }
-//     });
+let idsTorneos = [];
+
+//Por cada pareja en la que estoy selecciono el id del torneo al que pertenece 
+for(p of parejasQueEstoy){
+  idsTorneos.push(p.tournamentId);
+};
+
+//Busco los torneos en los que estoy con los ids de las parejas de antes
+ const torneosQueEstoy = await tournament.findAll({where:{
+   id:{
+    [Op.or]: [idsTorneos]
+
+   }
+ }
+});
+
+return res.status(400).json({tournamets: torneosQueEstoy});
+    };
