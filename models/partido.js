@@ -14,6 +14,7 @@ module.exports = (sequelize, DataTypes) => {
     set1Couple2: DataTypes.INTEGER,
     set2Couple2: DataTypes.INTEGER,
     set3Couple2: DataTypes.INTEGER,
+    coupleEditedId: DataTypes.INTEGER
 
 
   }, {});

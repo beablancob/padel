@@ -11,9 +11,14 @@ router.get('/tournaments/myTournaments', authController.verifyToken, userControl
 //Obtener torneos publicos sin empezar
 router.get('/tournaments/publicos', authController.verifyToken, userController.getPublicTournaments);
 
-
 //Obtener datos de un torneo
-router.get('/tournaments/:tournamentId', authController.verifyToken, authController.isPlayer, userController.getTournament);
+router.get('/tournaments/:tournamentId', authController.verifyToken, authController.isPlayerTournament, userController.getTournament);
+
+//Editar resultado de un partido
+router.put('/partido/:partidoId/editResult', authController.verifyToken, authController.isPlayerPartido, userController.editResultPartido );
+
+//Confirmar resultado de un partido
+router.put('/partido/:partidoId/confirmResult', authController.verifyToken, authController.isPlayerPartido, userController.confirmResultPartido);
 
 
 

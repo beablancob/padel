@@ -30,6 +30,15 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Headers', 'Authorization, X-API-KEY, Origin, X-Requested-With, Content-Type, Accept, Access-Control-Allow-Request-Method');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
+  res.header('Allow', 'GET, POST, OPTIONS, PUT, DELETE');
+  next();
+});
+
+
 
 // tournament.findOne()
 // .then(tournament => {
@@ -60,6 +69,8 @@ app.post('/signin', authRouter);
 //REGISTRO
 
 app.post('/signup', authRouter);
+
+//ADMIN
 
 //Obtener rondas anteriores
 app.get('/admin/tournament/:tournamentId/previousRounds', adminRouter);
@@ -100,7 +111,7 @@ app.get('/admin/tournaments', adminRouter);
 
 app.get('/admin/tournament/:tournamentId',adminRouter);
 
-
+//USER
 
 //Obtener torneos en los que juego
 app.get('/tournaments/myTournaments', userRouter);
@@ -112,6 +123,14 @@ app.get('/tournaments/publicos', userRouter);
 //Obtener datos de un torneo
 
 app.get('/tournaments/:tournamentId', userRouter);
+
+//Editar resultado de un partido
+app.put('/partido/:partidoId/editResult', userRouter);
+
+//Confirmar resultado
+app.put('/partido/:partidoId/confirmResult', userRouter);
+
+
 
 
 

@@ -75,3 +75,123 @@ exports.getTournament = async (req, res, next) => {
 
 
 };
+
+exports.editResultPartido = async(req, res, next) => {
+
+
+    //Buscar partido
+    match = await partido.findOne({where:
+    {
+        id: req.params.partidoId
+    }});
+
+    tourney = await tournament.findOne({where:
+    {
+        id: match.tournamentId
+    }})
+
+    //Ver que modificamos un partido de la ronda actual
+    if(tourney.rondaActual != match.numeroRonda){
+        return res.status(400).json({error:"No puedes modificar un resultado de una ronda anterior"});
+    }
+
+    const sets = req.body.sets;
+
+  //Obtener los sets del body y añadirselos al partido
+  //Comprobar que hay 6 sets y que ninguno es nulo
+  if(Object.keys(sets).length != 6){
+    return res.status(400).json({error: "El numero de sets total no es correcto"})
+  }
+
+  
+
+  for(set of sets) {
+    if(set == null ){
+      return res.status(400).json({error: "Error en un set"});
+    }
+
+  }
+
+  let juegospareja1 = sets[0]+sets[1]+sets[2];
+  let juegospareja2 = sets[3]+sets[4]+sets[5];
+
+  if(juegospareja1 === juegospareja2){
+    return res.status(400).json({error: "Error en los juegos introducidos"})
+  }
+  
+  //Sets pareja 1
+  set1Couple1 = sets[0];
+  set2Couple1 = sets[1];
+  set3Couple1 = sets[2];
+  //Sets pareja 2
+  set1Couple2 = sets[3];
+  set2Couple2 = sets[4];
+  set3Couple2 = sets[5];
+
+  //Actualizar los sets del partidos con los datos de la req
+  match.set1Couple1 = set1Couple1;
+  match.set2Couple1 = set2Couple1;
+  match.set3Couple1 = set3Couple1;
+  match.set1Couple2 = set1Couple2;
+  match.set2Couple2 = set2Couple2;
+  match.set3Couple2 = set3Couple2;
+    
+  //Vemos quien gana
+
+  if(juegospareja1 > juegospareja2){
+    match.ganador = match.couple1Id;
+    
+
+  }else {
+    match.ganador = match.couple2Id;
+  }
+
+  
+
+  
+    //Poner que pareja ha editado el partido
+    match.coupleEditedId = req.couple.id;
+    console.log(match.coupleEditedId);
+
+
+  //No ponemos true en este metodo si en confirmar
+  //partido.jugado = true;
+  //Una vez añadido el resultado lo guardamos en la bbdd
+  await match.save();
+
+ //Devolvemos el partido con los datos actualizados
+    return res.status(200).json({partido: match})
+
+
+
+};
+
+exports.confirmResultPartido = async(req, res, next) => {
+
+    match = await partido.findOne({where:
+        {
+            id: req.params.partidoId
+        }});
+    
+    //Como pasamos antes el middleware de isPlayingPartido,
+    //solo comprobamos que no sea el mismo id que coupleEditedId
+    console.log(req.couple.id);
+    if(req.couple.id != match.coupleEditedId){
+        match.jugado = true;
+        await match.save();
+        return res.status(200).json({confirm: "true", partido: match});
+        
+    }
+
+    return res.status(400).json({error:"Tiene que confirmar un miembro de la otra pareja el resultado"}) 
+        
+
+        
+        
+
+        
+       
+        
+        
+
+};
