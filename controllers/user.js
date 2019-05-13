@@ -27,12 +27,12 @@ exports.getPublicTournaments = (req, res, next) => {
 
 };
 
-//Obtener torneos en los que estoy incristo o estoy jugando
+//Obtener torneos en los que estoy inscrito o estoy jugando
  exports.getMyTournaments = async (req, res, next) => {
 
 //     //Cojo parejas en las que estoy
 const parejasQueEstoy = await couple.findAll({where:{
-    [Op.or]: [{user1Id: 1}, {user2Id: 1}]
+    [Op.or]: [{user1Id: req.userId}, {user2Id: req.userId}]
 
 }
 });
@@ -59,3 +59,19 @@ for(p of parejasQueEstoy){
 
 return res.status(400).json({tournamets: torneosQueEstoy});
     };
+
+//Obtener datos torneo
+exports.getTournament = async (req, res, next) => {
+    
+    //Buscamos el torneo
+    tourney = await tournament.findOne({where:
+    {
+        id:req.params.tournamentId
+    }});
+    
+    return res.status(200).json({tournament: tourney});
+
+
+
+
+};

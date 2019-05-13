@@ -180,7 +180,7 @@ exports.editTournament = async (req, res, next) => {
 
 };
 
-//Dar inicia la primera ronda de un torneo
+//Dar inicio a la primera ronda de un torneo
 exports.startTournament = async (req, res, next) => {
 
 

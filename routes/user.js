@@ -12,6 +12,9 @@ router.get('/tournaments/myTournaments', authController.verifyToken, userControl
 router.get('/tournaments/publicos', authController.verifyToken, userController.getPublicTournaments);
 
 
+//Obtener datos de un torneo
+router.get('/tournaments/:tournamentId', authController.verifyToken, authController.isPlayer, userController.getTournament);
+
 
 
 

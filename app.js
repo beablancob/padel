@@ -109,6 +109,10 @@ app.get('/tournaments/myTournaments', userRouter);
 
 app.get('/tournaments/publicos', userRouter);
 
+//Obtener datos de un torneo
+
+app.get('/tournaments/:tournamentId', userRouter);
+
 
 
 

@@ -1,6 +1,8 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
-const {user, tournament} = require('../models/index');
+const {user, tournament, couple} = require('../models/index');
+const Sequelize = require('sequelize');
+const Op = Sequelize.Op;
 
 //Comprobamos que no este duplicado el correo
 
@@ -54,7 +56,7 @@ exports.postSignIn = (req,res,next) => {
     .then(user => {
 
         if (!user){
-           return res.status(404).json({msg:"el correo no existe"});
+           return res.status(404).json({msg:"El correo no existe"});
         }
         
         const validPassword = bcrypt.compareSync(req.body.password, user.password);
@@ -79,18 +81,19 @@ exports.postSignIn = (req,res,next) => {
 
 exports.verifyToken = (req,res, next) => {
     
-
+    //Comprobar el token
     const token = req.headers['x-access-token'];
 
     if (!token) {
         return res.json({
-            msg:"No enviaste ningun token"
+            msg:"No enviaste ningún token"
         })
     }
 
+
     jwt.verify(token, "secreto", (err, decoded) => {
         if(err){
-            return res.json({msg: "token invalido"});
+            return res.json({msg: "El token no es válido"});
         }
         req.userId = decoded.user.id;
         
@@ -103,7 +106,7 @@ exports.verifyToken = (req,res, next) => {
 exports.isAdmin = (req, res, next) => {
 
     
-
+    //Buscamos el torneo y comprobamos
     tournament.findOne({
         where: {
             id: req.params.tournamentId
@@ -126,8 +129,42 @@ exports.isAdmin = (req, res, next) => {
     .catch(err => console.log(err));
 
 
+};
 
-    
+//Si es public pasa y si es privado tiene que estar en una pareja que pertenezca a ese torneo
+exports.isPlayer = async (req, res, next) => {
+
+    if(req.params.tournamentId == null){
+        return res.status(400).json({error: "El id insertado de torneo no es correcto"})
+    }
+
+    //Coger las parejas que tiene el user(user1Id) y ver
+    // si alguna de las que pertence esta el torneo, si esta next, si no error
+
+    pareja = await couple.findOne({where:
+    {
+        [Op.or]: [{user1Id:req.userId}, {user2Id:req.userId}],
+          tournamentId: req.params.tournamentId
+    }});
+
+    tourney = await tournament.findOne({where:
+    {
+        id: req.params.tournamentId
+    }})
+
+    if(tourney == null){
+        return res.status(400).json({erro: "No existe un torneo con este id"});
+    }
+
+    if(pareja != null && tourney.publico == true){
+       return next();
+    }
+
+    if (pareja != null && pareja.tournamentId == req.params.tournamentId){
+        return next();
+    }
+
+    return res.status(400).json({error: "Usted no pertenece a este torneo"});
 
 
 };
