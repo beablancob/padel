@@ -372,15 +372,90 @@ exports.editResult = async (req, res, next) => {
   partido.set1Couple2 = set1Couple2;
   partido.set2Couple2 = set2Couple2;
   partido.set3Couple2 = set3Couple2;
+
+  //Cogemos las 2 parejas y actualizamos valores
+  couple1 = await couple.findOne({where:{
+      id: partido.couple1Id
+  }});
+
+  couple2 = await couple.findOne({where:{
+      id: partido.couple2Id
+  }});
+  
+  //Actulizar juegos
+  couple1.juegosGanados = couple1.juegosGanados + juegospareja1;
+  couple1.juegosPerdidos = couple1.juegosPerdidos + juegospareja2;
+
+  couple2.juegosGanados = couple2.juegosGanados + juegospareja2;
+  couple2.juegosPerdidos = couple2.juegosPerdidos + juegospareja1;
+
+  //Actualizar partidos jugados
+  couple1.partidosJugados = couple1.partidosJugados + 1;
+  couple2.partidosJugados = couple2.partidosJugados + 1;
+
+  if( partido.set1Couple1 > partido.set1Couple2){
+    couple1.setsGanados = couple1.setsGanados + 1;
+    couple2.setsPerdidos = couple2.setsPerdidos + 1;
     
-  //Vemos quien gana 
+  } else{
+   couple1.setsPerdidos = couple1.setsPerdidos + 1;
+   couple2.setsGanados = couple2.setsGanados + 1;
+  }
+  //Set 2
+  if( partido.set2Couple1 > partido.set2Couple2){
+    couple1.setsGanados = couple1.setsGanados + 1;
+    couple2.setsPerdidos = couple2.setsPerdidos + 1;
+   
+ } else{
+    couple1.setsPerdidos = couple1.setsPerdidos + 1;
+   couple2.setsGanados = couple2.setsGanados + 1;
+ }
+ //Set 3
+ if( partido.set3Couple1 > partido.set3Couple2){
+    couple1.setsGanados = couple1.setsGanados + 1;
+    couple2.setsPerdidos = couple2.setsPerdidos + 1;
+   
+ } else{
+    couple1.setsPerdidos = couple1.setsPerdidos + 1;
+   couple2.setsGanados = couple2.setsGanados + 1;
+ }
+
+  
+
+    
+  //Actualizar partidos ganados y partidos perdidos 
   if(juegospareja1 > juegospareja2){
     partido.ganador = partido.couple1Id;
+    couple1.partidosGanados = couple1.partidosGanados + 1;
+    couple2.partidosPerdidos = couple2.partidosPerdidos + 1;
+
+    //Actualizar puntos
+    couple1.puntos = couple1.puntos + tourney.puntosPG;
+    couple2.puntos = couple2.puntos + tourney.puntosPP;
+
     
 
   }else {
     partido.ganador = partido.couple2Id;
+
+    couple1.partidosPerdidos = couple1.partidosPerdidos + 1;
+    couple2.partidosGanados = couple2.partidosGanados + 1;
+
+    couple1.puntos = couple1.puntos + tourney.puntosPG;
+    couple2.puntos = couple2.puntos + tourney.puntosPP;
+
   }
+
+  //Actualizar diferencia de sets y diferencia de juegos
+  couple1.diferenciaSets = couple1.diferenciaSets + (partido.set1Couple1 + partido.set2Couple1 + partido.set3Couple1 - (partido.set1Couple2 + partido.set2Couple2 + partido.set3Couple2));
+  couple2.diferenciaSets = couple2.diferenciaSets + (partido.set1Couple2 + partido.set2Couple2 + partido.set3Couple2 - (partido.set1Couple1 + partido.set2Couple1 + partido.set3Couple1));
+
+  couple1.diferenciaJuegos = couple1.diferenciaJuegos + (juegospareja1 - juegospareja2);
+  couple2.diferenciaJuegos = couple2.diferenciaJuegos + (juegospareja2 - juegospareja1);
+
+  //Guardamos en la bbdd
+  await couple1.save();
+  await couple2.save();
   
   partido.jugado = true;
   //Una vez añadido el resultado lo guardamos en la bbdd
@@ -391,6 +466,7 @@ exports.editResult = async (req, res, next) => {
 
 };
 
+//Pasar a la siguiente ronda
 exports.nextRound = async (req,res,next) => {
 
     let grupos = [];
@@ -409,145 +485,133 @@ exports.nextRound = async (req,res,next) => {
         }
     });
 
-    // Comprobar que se han jugado todos los partidos de la ronda para avanzar a la siguiente
+    if(tourney.rondaActual == 0 || tourney.rondaActual == tourney.numeroRondas){
+        return res.status(400).json({error: "El torneo aun no ha comenzado o está en la ultima ronda"});
+      }
+
+    // Coger grupos de los partidos
     for(p of partidosRondaActual){
-        if (p.ganador == null){
-            return res.status(400).json({error: "Quedan partidos por jugar esta ronda"});
-        }
+    
         if(grupos.indexOf(p.numeroGrupo) === -1){
             grupos.push(p.numeroGrupo);
             
         }
-    }
-    console.log(grupos);
-    
-    if(tourney.rondaActual == 0 || tourney.rondaActual == tourney.numeroRondas){
-      return res.status(400).json({error: "El torneo aun no ha comenzado o está en la ultima ronda"});
-    }
 
-    //Actualizamos todas los puntos y los juegos de las parejas del torneo
-    const parejas = await tourney.getCouples({});
-    console.log(Object.keys(parejas).length);
-
-    //Para cada pareja del torneo obtenemos los partidos que ha jugado
-    for (pareja of parejas){
-
-      const partidosPareja = await partido.findAll({
-        where:
-        {
-          [Op.or]: [{couple1Id:pareja.id}, {couple2Id:pareja.id}],
-          tournamentId: tourney.id
+        //Si no esta partido.jugado = true no sumar o no hay ningun resultado provisional(sin confirmar)
+        if(p.jugado != true && p.coupleEditedId == null){
+            continue;
         }
-       });
-       //console.log(partidosPareja);
 
-       //Sumar los puntos, juegos y sets de esta ronda a los puntos de la pareja
-       let puntos = pareja.puntos;
-       let juegosGanados = pareja.juegosGanados;
-       let juegosPerdidos = pareja.juegosPerdidos;
-       let setsGanados = pareja.setsGanados;
-       let setsPerdidos = pareja.setsPerdidos;
-       let beforeJuegosGanados = pareja.juegosGanados;
-       let beforeJuegosPerdidos = pareja.juegosPerdidos;
-       let beforeSetsGanados = pareja.setsGanados;
-       let beforeSetsPerdidos = pareja.setsPerdidos;
+        //Si no esta confirmado, confirmarlo y sumar actualizar parejas
+        if(p.jugado != true && p.coupleEditedId != null){
 
-    //    console.log(puntos);
-    //    console.log(juegosGanados);
-    //    console.log(juegosPerdidos);
-    //    console.log(setsGanados);
-    //    console.log(setsPerdidos);
-       for (p of partidosPareja){
-        //console.log(p.ganador);
-         //console.log(pareja)
-         //Sumar puntos y partidos
+            match = p;
 
-         if(p.ganador == pareja.id){
-           puntos = puntos +  tourney.puntosPG;
-           pareja.partidosGanados = pareja.partidosGanados + 1;
-           pareja.partidosJugados = pareja.partidosJugados + 1;
+            match.jugado = true;
+            await match.save();
 
-         }else{
-           puntos = puntos + tourney.puntosPP;
-           pareja.partidosPerdidos = pareja.partidosPerdidos + 1;
-           pareja.partidosJugados = pareja.partidosJugados + 1;
-         }
 
-         //Sumar sets
-         if(p.couple1Id == pareja.id){
-           juegosGanados = juegosGanados + p.set1Couple1 + p.set2Couple1 + p.set3Couple1;
-           juegosPerdidos = juegosPerdidos +p.set1Couple2 + p.set2Couple2 + p.set3Couple2;
-           console.log(p.set1Couple1);
-           console.log(juegosGanados);
-           console.log(juegosPerdidos);
 
-           //Vemos si ganamos el primer set o no. Asi con los 3 sets
-           //Set 1
-           if( p.set1Couple1 > p.set1Couple2){
-             setsGanados = setsGanados + 1;
-             
-           } else{
-            setsPerdidos = setsPerdidos + 1
-           }
-           //Set 2
-           if( p.set2Couple1 > p.set2Couple2){
-            setsGanados = setsGanados + 1;
-            
-          } else{
-           setsPerdidos = setsPerdidos + 1
-          }
-          //Set 3
-          if( p.set3Couple1 > p.set3Couple2){
-            setsGanados = setsGanados + 1;
-            
-          } else{
-           setsPerdidos = setsPerdidos + 1
-          }
+        //Actualizar valores parejas
+        let juegospareja1 = match.set1Couple1 + match.set2Couple1 + match.set3Couple1;
+        let juegospareja2 = match.set1Couple2 + match.set2Couple2 + match.set3Couple2;
 
-         }else {
-          juegosPerdidos = juegosPerdidos + p.set1Couple1 + p.set2Couple1 + p.set3Couple1;
-          juegosGanados = juegosGanados +p.set1Couple2 + p.set2Couple2 + p.set3Couple2;
+        //Cogemos las 2 parejas y actualizamos valores
+        couple1 = await couple.findOne({where:{
+        id: match.couple1Id
+            }});
 
-          //Vemos si ganamos el primer set o no. Asi con los 3 sets
-           //Set 1
-           if( p.set1Couple2 > p.set1Couple1){
-            setsGanados = setsGanados + 1;
-            
-          } else{
-           setsPerdidos = setsPerdidos + 1
-          }
-          //Set 2
-          if( p.set2Couple2 > p.set2Couple1){
-           setsGanados = setsGanados + 1;
-           
-         } else{
-          setsPerdidos = setsPerdidos + 1
-         }
-         //Set 3
-         if( p.set3Couple2 > p.set3Couple1){
-           setsGanados = setsGanados + 1;
-           
-         } else{
-          setsPerdidos = setsPerdidos + 1
-         }
+        couple2 = await couple.findOne({where:{
+            id: match.couple2Id
+            }});
 
-         }
 
-       }
-       //console.log(puntos);
-       //Añadimos los puntos, sets y juegos a las parejas y las actualizamos en la bbdd para cada pareja del torneo
-        pareja.puntos = puntos;
-        pareja.setsGanados = setsGanados;
-        pareja.setsPerdidos = setsPerdidos;
-        pareja.juegosGanados = juegosGanados;
-        pareja.juegosPerdidos = juegosPerdidos;
+            //Actulizar juegos
+  couple1.juegosGanados = couple1.juegosGanados + juegospareja1;
+  couple1.juegosPerdidos = couple1.juegosPerdidos + juegospareja2;
 
-        //Calculamos diferencia de sets y juegos esta ronda
+  couple2.juegosGanados = couple2.juegosGanados + juegospareja2;
+  couple2.juegosPerdidos = couple2.juegosPerdidos + juegospareja1;
 
-        pareja.diferenciaSets = (pareja.setsGanados - beforeSetsGanados) - (pareja.setsPerdidos - beforeSetsPerdidos);
-        pareja.diferenciaJuegos = (pareja.juegosGanados - beforeJuegosGanados) - (pareja.juegosPerdidos - beforeJuegosPerdidos);
-        
-       await pareja.save();
+  //Actualizar partidos jugados
+  couple1.partidosJugados = couple1.partidosJugados + 1;
+  couple2.partidosJugados = couple2.partidosJugados + 1;
+
+  if( match.set1Couple1 > match.set1Couple2){
+    couple1.setsGanados = couple1.setsGanados + 1;
+    couple2.setsPerdidos = couple2.setsPerdidos + 1;
+    
+  } else{
+   couple1.setsPerdidos = couple1.setsPerdidos + 1;
+   couple2.setsGanados = couple2.setsGanados + 1;
+  }
+  //Set 2
+  if( match.set2Couple1 > match.set2Couple2){
+    couple1.setsGanados = couple1.setsGanados + 1;
+    couple2.setsPerdidos = couple2.setsPerdidos + 1;
+   
+ } else{
+    couple1.setsPerdidos = couple1.setsPerdidos + 1;
+   couple2.setsGanados = couple2.setsGanados + 1;
+ }
+ //Set 3
+ if( match.set3Couple1 > match.set3Couple2){
+    couple1.setsGanados = couple1.setsGanados + 1;
+    couple2.setsPerdidos = couple2.setsPerdidos + 1;
+   
+ } else{
+    couple1.setsPerdidos = couple1.setsPerdidos + 1;
+   couple2.setsGanados = couple2.setsGanados + 1;
+ }
+
+  
+
+    
+  //Actualizar partidos ganados y partidos perdidos 
+  if(juegospareja1 > juegospareja2){
+    couple1.partidosGanados = couple1.partidosGanados + 1;
+    couple2.partidosPerdidos = couple2.partidosPerdidos + 1;
+
+    //Actualizar puntos
+    couple1.puntos = couple1.puntos + tourney.puntosPG;
+    couple2.puntos = couple2.puntos + tourney.puntosPP;
+
+    
+
+  }else {
+   
+
+    couple1.partidosPerdidos = couple1.partidosPerdidos + 1;
+    couple2.partidosGanados = couple2.partidosGanados + 1;
+
+    couple1.puntos = couple1.puntos + tourney.puntosPG;
+    couple2.puntos = couple2.puntos + tourney.puntosPP;
+
+  }
+
+  //Actualizar diferencia de sets y diferencia de juegos
+  couple1.diferenciaSets = couple1.diferenciaSets + (match.set1Couple1 + match.set2Couple1 + match.set3Couple1 - (match.set1Couple2 + match.set2Couple2 + match.set3Couple2));
+  couple2.diferenciaSets = couple2.diferenciaSets + (match.set1Couple2 + match.set2Couple2 + match.set3Couple2 - (match.set1Couple1 + match.set2Couple1 + match.set3Couple1));
+
+  couple1.diferenciaJuegos = couple1.diferenciaJuegos + (juegospareja1 - juegospareja2);
+  couple2.diferenciaJuegos = couple2.diferenciaJuegos + (juegospareja2 - juegospareja1);
+
+  //Guardamos en la bbdd
+  await couple1.save();
+  await couple2.save();
+
+
+        }
+
+
+    }
+
+
+    const parejas = await tourney.getCouples();
+    //console.log(Object.keys(parejas).length);
+
+    //Creamos las previousRounds
+    for (pareja of parejas){
 
        await couplePreviousRound.create({
            coupleId: pareja.id,
@@ -565,10 +629,11 @@ exports.nextRound = async (req,res,next) => {
            diferenciaSets: pareja.diferenciaSets,
            diferenciaJuegos: pareja.diferenciaJuegos
 
-       })
-
-
+       
+        })
     }
+
+
 
     //Ordenamos los grupos segun hayan quedado en esta ronda
     
@@ -638,7 +703,8 @@ exports.nextRound = async (req,res,next) => {
     //console.log(parejasQueBajan);
     //console.log(parejasQueSuben);
 
-    //Cojo los indices de las que suben y las que bajan y las intercambio una a una ya que estan ordenados los grupos una vez finalizados los partidos
+    //Cojo los indices de las que suben y las que bajan y las intercambio
+    //una a una ya que estan ordenados los grupos una vez finalizados los partidos
     for (let i = 0; i < parejasQueBajan.length; i++) { 
       let indexBaja;
       let indexSube;
@@ -746,6 +812,14 @@ exports.nextRound = async (req,res,next) => {
   for (p of parejas){
       p.diferenciaJuegos  = 0;
       p.diferenciaSets = 0;
+      p.partidosJugados = 0;
+      p.partidosGanados = 0;
+      p.partidosPerdidos = 0;
+      p.setsGanados = 0;
+      p.setsPerdidos = 0;
+      p.juegosGanados = 0;
+      p.juegosPerdidos = 0;
+      p.puntos = 0;
       p.save();
   }
 
@@ -827,7 +901,6 @@ return res.status(200).json({clasificacion: clasificacion});
 
 
 }
-
 
 
 

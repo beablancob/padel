@@ -166,13 +166,22 @@ exports.confirmResultPartido = async(req, res, next) => {
         {
             id: req.params.partidoId
         }});
+
+        tourney = await tournament.findOne({where:{
+        id: match.tournamentId
+    }})
     
     //Como pasamos antes el middleware de isPlayingPartido,
     //solo comprobamos que no sea el mismo id que coupleEditedId
     console.log(req.couple.id);
     if(req.couple.id != match.coupleEditedId){
-        match.jugado = true;
-        await match.save();
+        
+
+
+
+
+        
+
         return res.status(200).json({confirm: "true", partido: match});
         
     }

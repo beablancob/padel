@@ -56,10 +56,7 @@ app.use((req, res, next) => {
 
 async function  aaa(){
 
-var id = await uuidv4();
-console.log(id);
-var id = await uuidv4();
-console.log(id);
+
 
 
 
