@@ -218,3 +218,82 @@ return res.status(201).json({edited: true});
 
 
 };
+
+exports.tournamentRegister = async(req, res, next) => {
+    
+    if(!req.params.registerLink){
+        return res.status(400).json({error: "No envió un link de torneo"})
+    }
+    //Buscamos el torneo con el parametro registerLink
+    tourney = await tournament.findOne({where:{
+    registerLink: req.params.registerLink }});
+
+    if(!tourney){
+        return res.status(400).json({error: "No existe ningun torneo con ese id"})
+        
+    }
+    if(tourney.rondaActual != 0){
+        return res.status(400).json({error: "El torneo ya ha comenzado"})
+    }
+
+    //Vemos si ya estamos registrados en el torneo
+    coup = await couple.findOne({where:{
+        tournamentId: tourney.id,
+        [Op.or]: [{user1Id: req.userId}, {user2Id: req.userId}]
+
+    }
+
+    })
+
+    //Si estamos registrados devolver la pareja
+    if(coup){
+        return res.status(400).json({error:"Ya está registrado en este torneo", couple:coup})
+    }
+
+    
+
+    
+
+    //Creamos la pareja de ese torneo
+    if(req.body.emailUser2){
+
+        //Buscar usuario de nuestra pareja
+        user2 = await user.findOne({where:{
+            email: req.body.emailUser2
+        }})
+
+        if(!user2){
+            return res.status(400).json({error:"No existe ningún usuario con ese email"})
+        }
+
+        coup2 = await couple.findOne({where:{
+            tournamentId: tourney.id,
+            [Op.or]: [{user1Id: user2.id}, {user2Id: req.user2.id}]
+    
+        }
+    
+        })
+        
+        if(coup2){
+            return res.status(400).json({error:"Su compañero ya esta registrado"});
+
+        }
+
+
+        c= await couple.create({
+            tournamentId: tourney.id,
+            user1Id: req.userId,
+            user2Id: user2.id
+        }
+        )
+
+        return res.status(201).json({registered:true, couple:c});
+
+
+    }
+    return res.status(400).json({error: "No envió el email de su pareja"})
+
+
+};
+
+

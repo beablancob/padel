@@ -140,6 +140,9 @@ app.put('/partido/:partidoId/editResult', userRouter);
 //Confirmar resultado
 app.put('/partido/:partidoId/confirmResult', userRouter);
 
+//Registrarse en un torneo que aun no ha comenzado con enlace
+app.put('/tournament/register/:registerLink', userRouter);
+
 
 
 app.use('/', indexRouter);

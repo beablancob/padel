@@ -23,7 +23,8 @@ router.put('/partido/:partidoId/confirmResult', authController.verifyToken, auth
 //Editar info usuario
 router.put('/user/editInfo', authController.verifyToken, userController.editInfo);
 
-
+//Registrarse en un torneo
+router.put('/tournament/register/:registerLink', authController.verifyToken, userController.tournamentRegister);
 
 
 
