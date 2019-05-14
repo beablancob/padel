@@ -14,7 +14,15 @@ exports.postTournament = (req,res,next) => {
         tournament.create({
             name: name,
             numberCouples: numberCouples,
-            adminId: req.userId
+            adminId: req.userId,
+            parejasPorGrupo: req.body.parejasPorGrupo,
+            publico:req.body.publico,
+            puntosPG:req.body.puntosPG,
+            puntosPP: req.body.puntosPP,
+            idaYvuelta: req.body.idaYvuelta,
+            numeroRondas: req.body.numeroRondas,
+            parejasSuben: req.body.parejasSuben
+
         }).then(tournament => {
             res.status(201).json({msg:"Torneo creado con éxtio",
             tournament: tournament

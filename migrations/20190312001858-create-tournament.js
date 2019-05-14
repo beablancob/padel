@@ -1,4 +1,6 @@
+const uuidv4 = require('uuid/v4');
 'use strict';
+
 module.exports = {
   up: (queryInterface, Sequelize) => {
     return queryInterface.createTable('tournaments', {
@@ -57,6 +59,11 @@ module.exports = {
       parejasSuben: {
         type:Sequelize.INTEGER,
         defaultValue:0
+      },
+      registerLink: {
+        type:Sequelize.UUID,
+        defaultValue:uuidv4(),
+        unique:true
       }
     });
   },

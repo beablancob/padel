@@ -32,6 +32,7 @@ exports.postSignup = (req, res, next) => {
 
     user.create({
         name: req.body.name,
+        apellidos: req.body.apellidos,
         email:req.body.email,
         password: bcrypt.hashSync(req.body.password,10)
 
@@ -96,6 +97,7 @@ exports.verifyToken = (req,res, next) => {
             return res.json({msg: "El token no es válido"});
         }
         req.userId = decoded.user.id;
+        req.user = decoded.user;
         
 
         next();

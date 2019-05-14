@@ -20,6 +20,9 @@ router.put('/partido/:partidoId/editResult', authController.verifyToken, authCon
 //Confirmar resultado de un partido
 router.put('/partido/:partidoId/confirmResult', authController.verifyToken, authController.isPlayerPartido, userController.confirmResultPartido);
 
+//Editar info usuario
+router.put('/user/editInfo', authController.verifyToken, userController.editInfo);
+
 
 
 

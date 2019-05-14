@@ -1,4 +1,5 @@
 'use strict';
+const uuidv4 = require('uuid/v4');
 module.exports = (sequelize, DataTypes) => {
   const tournament = sequelize.define('tournament', {
     name: {type: DataTypes.STRING,
@@ -10,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     numberCouples: {type: DataTypes.INTEGER,
       allowNull: false,
-      defaultValue: 0
+      defaultValue: 1
     }
    ,
   parejasPorGrupo: {type: DataTypes.INTEGER,
@@ -19,16 +20,17 @@ module.exports = (sequelize, DataTypes) => {
   }
   ,
   publico: { type: DataTypes.BOOLEAN,
-    allowNull:false
+    allowNull:false,
+    defaultValue:false
 
   },
   puntosPG: {type: DataTypes.INTEGER,
     allowNull: false,
-    defaultValue: 0
+    defaultValue: 2
   },
   puntosPP: {type: DataTypes.INTEGER,
     allowNull: false,
-    defaultValue:0
+    defaultValue:1
   },
   rondaActual:{type: DataTypes.INTEGER,
     defaultValue: 0
@@ -45,6 +47,11 @@ module.exports = (sequelize, DataTypes) => {
   parejasSuben: {
     type:DataTypes.INTEGER,
     defaultValue:0
+  },
+  registerLink: {
+    type:DataTypes.UUIDV4,
+    defaultValue: uuidv4(),
+    allowNull:false
   }
 
   }, {});

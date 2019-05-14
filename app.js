@@ -3,13 +3,15 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+var Combinatorics = require('js-combinatorics');
+
+const uuidv4 = require('uuid/v4');
 
 
 var indexRouter = require('./routes/index');
 var authRouter = require('./routes/auth');
 var adminRouter = require('./routes/admin');
 var userRouter = require('./routes/user');
-var Combinatorics = require('js-combinatorics');
 
 const {user, tournament, couple, partido} = require('./models/index');
 
@@ -54,10 +56,17 @@ app.use((req, res, next) => {
 
 async function  aaa(){
 
+var id = await uuidv4();
+console.log(id);
+var id = await uuidv4();
+console.log(id);
+
+
+
 
 }
 
-//aaa();
+aaa();
 
 
 
@@ -112,6 +121,10 @@ app.get('/admin/tournaments', adminRouter);
 app.get('/admin/tournament/:tournamentId',adminRouter);
 
 //USER
+
+//Editar datos de usuario
+
+app.put('/user/editInfo', userRouter);
 
 //Obtener torneos en los que juego
 app.get('/tournaments/myTournaments', userRouter);

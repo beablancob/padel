@@ -1,4 +1,6 @@
 const {user, tournament, couple, partido, couplePreviousRound} = require('../models/index');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
 
@@ -179,6 +181,31 @@ exports.confirmResultPartido = async(req, res, next) => {
 
 };
 
-exports.userEdit = async(req, res, next) => {
+exports.editInfo = async(req, res, next) => {
+
     
+    
+  u = await user.findOne({where:{
+    id: req.userId
+    }});
+
+    //Si envia password encriptarlo con bcrypt
+    if(req.body.password){
+    console.log("se ejecuta");
+    req.body.password = await bcrypt.hashSync(req.body.password,10);
+    }
+
+
+u.email = req.body.email || u.email;
+u.name = req.body.name || u.name;
+u.apellidos = req.body.apellidos || u.apellidos;
+u.password = req.body.password || u.password;
+
+u.save();
+
+return res.status(201).json({edited: true});
+//Enviar nuevo token?? ya que en el token estan los datos del user y si se mantiene el token los valores no concuerdan
+    
+
+
 };
