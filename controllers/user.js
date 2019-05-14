@@ -296,4 +296,50 @@ exports.tournamentRegister = async(req, res, next) => {
 
 };
 
+//Obtener una ronda en concreto
+exports.getRondaInfo = async(req, res, next) => {
+
+
+    if(!req.params.numeroRonda){
+        return res.status(400).json({error: "No ha indicado la ronda que busca"});
+    }
+
+    if(req.params.numeroRonda < 1 || req.params.numeroRonda > req.tourney.rondaActual){
+        return res.status(400).json({error: "El número de la ronda no es correcto"});
+    }
+
+    //Si es la ronda actual cogemos couples y los partidos de ahora
+    if(req.tourney.rondaActual == req.params.numeroRonda){
+        parejas = await tourney.getCouples({order: [
+            ['puntos', 'DESC'],
+            ['diferenciaSets', 'DESC'],
+            ['diferenciaJuegos', 'DESC']
+          ]});
+
+        partidos = await tourney.getPartidos({where:
+        {
+            numeroRonda: tourney.rondaActual
+        }})
+        return res.status(200).json({parejas: parejas, partidos:partidos })
+    }
+
+    //Si no es la ronda actual coger las parejas de previousCouples
+    parejas = await tourney.getCouplePreviousRounds({where:{
+        round: req.params.numeroRonda
+
+         }, order: [
+        ['puntos', 'DESC'],
+        ['diferenciaSets', 'DESC'],
+        ['diferenciaJuegos', 'DESC']
+         ]
+            });
+    partidos = await tourney.getPartidos({where:{
+        numeroRonda: req.params.numeroRonda
+    }})
+    return res.status(200).json({parejas: parejas, partidos:partidos })
+
+    
+
+};
+
 

@@ -5,6 +5,10 @@ const authController = require('../controllers/auth');
 const userController = require('../controllers/user');
 
 
+
+//Obtener una ronda de un torneo que juego o es publico
+router.get('/tournament/:tournamentId/ronda/:numeroRonda', authController.verifyToken, authController.isPlayerTournament, userController.getRondaInfo);
+
 //Obtener los torneos que estoy inscrito
 router.get('/tournaments/myTournaments', authController.verifyToken, userController.getMyTournaments);
 
@@ -25,6 +29,7 @@ router.put('/user/editInfo', authController.verifyToken, userController.editInfo
 
 //Registrarse en un torneo
 router.put('/tournament/register/:registerLink', authController.verifyToken, userController.tournamentRegister);
+
 
 
 

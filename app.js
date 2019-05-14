@@ -119,6 +119,9 @@ app.get('/admin/tournament/:tournamentId',adminRouter);
 
 //USER
 
+//Obtener una ronda en concreto
+app.get('/tournament/:tournamentId/ronda/:numeroRonda', userRouter);
+
 //Editar datos de usuario
 
 app.put('/user/editInfo', userRouter);
@@ -142,6 +145,8 @@ app.put('/partido/:partidoId/confirmResult', userRouter);
 
 //Registrarse en un torneo que aun no ha comenzado con enlace
 app.put('/tournament/register/:registerLink', userRouter);
+
+
 
 
 

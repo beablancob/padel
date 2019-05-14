@@ -153,15 +153,17 @@ exports.isPlayerTournament = async (req, res, next) => {
         id: req.params.tournamentId
     }});
     
-    if(tourney == null){
+    if(!tourney ){
         return res.status(400).json({error: "No existe un torneo con este id"});
     }
 
-    if(pareja != null && tourney.publico == true){
+    if(tourney.publico == true){
+        req.tourney = tourney;
        return next();
     }
 
     if (pareja != null && pareja.tournamentId == req.params.tournamentId){
+        req.tourney = tourney;
         return next();
     }
 
