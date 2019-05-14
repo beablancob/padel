@@ -82,7 +82,6 @@ exports.getTournament = (req,res,next) => {
 
 exports.putAddCouple = (req, res, next) => {
    
-   
     //Buscar usuario1
     user.findOne({
         where: {
@@ -96,8 +95,6 @@ exports.putAddCouple = (req, res, next) => {
         };
         
         req.user1Id = user.id;
-
-        
 
     }).then(() =>{
 
@@ -116,7 +113,6 @@ exports.putAddCouple = (req, res, next) => {
             req.user2Id = user.id;
 
         }).then(() => {
-
 
             couple.create({
                 user1Id: req.user1Id,
@@ -240,7 +236,6 @@ exports.startTournament = async (req, res, next) => {
               p.grupoActual = j;
              await p.save();
 
-
           }
           //console.log(parejas);
           //Usamos el paquete combinator para hacer los partidos
@@ -271,7 +266,6 @@ exports.startTournament = async (req, res, next) => {
                 numeroGrupo:j,
                 couple1Id:a[0].id,
                 couple2Id:a[1].id
-        
         
               },
             {
@@ -309,7 +303,6 @@ exports.startTournament = async (req, res, next) => {
             return res.status(500).json({error: err});
 
         })
-
     
 };
 
@@ -340,8 +333,6 @@ exports.editResult = async (req, res, next) => {
   if(Object.keys(sets).length != 6){
     return res.status(400).json({error: "El numero de sets total no es correcto"})
   }
-
-  
 
   for(set of sets) {
     if(set == null ){
@@ -374,9 +365,7 @@ exports.editResult = async (req, res, next) => {
   partido.set2Couple2 = set2Couple2;
   partido.set3Couple2 = set3Couple2;
     
-  //Vemos quien gana
-
-  
+  //Vemos quien gana 
   if(juegospareja1 > juegospareja2){
     partido.ganador = partido.couple1Id;
     
@@ -404,7 +393,6 @@ exports.nextRound = async (req,res,next) => {
     }else{
         id = req.params.tournamentId;
     }
-
 
     const tourney = await tournament.findById(id);
     const partidosRondaActual = await tourney.getPartidos({
@@ -455,8 +443,6 @@ exports.nextRound = async (req,res,next) => {
        let beforeJuegosPerdidos = pareja.juegosPerdidos;
        let beforeSetsGanados = pareja.setsGanados;
        let beforeSetsPerdidos = pareja.setsPerdidos;
-
-
 
     //    console.log(puntos);
     //    console.log(juegosGanados);
@@ -510,7 +496,6 @@ exports.nextRound = async (req,res,next) => {
            setsPerdidos = setsPerdidos + 1
           }
 
-
          }else {
           juegosPerdidos = juegosPerdidos + p.set1Couple1 + p.set2Couple1 + p.set3Couple1;
           juegosGanados = juegosGanados +p.set1Couple2 + p.set2Couple2 + p.set3Couple2;
@@ -540,7 +525,6 @@ exports.nextRound = async (req,res,next) => {
 
          }
 
-
        }
        //console.log(puntos);
        //Añadimos los puntos, sets y juegos a las parejas y las actualizamos en la bbdd para cada pareja del torneo
@@ -555,7 +539,6 @@ exports.nextRound = async (req,res,next) => {
         pareja.diferenciaSets = (pareja.setsGanados - beforeSetsGanados) - (pareja.setsPerdidos - beforeSetsPerdidos);
         pareja.diferenciaJuegos = (pareja.juegosGanados - beforeJuegosGanados) - (pareja.juegosPerdidos - beforeJuegosPerdidos);
         
-
        await pareja.save();
 
        await couplePreviousRound.create({
@@ -577,8 +560,6 @@ exports.nextRound = async (req,res,next) => {
        })
 
 
-
-
     }
 
     //Ordenamos los grupos segun hayan quedado en esta ronda
@@ -598,8 +579,7 @@ exports.nextRound = async (req,res,next) => {
         
       });
 
-      //console.log(parejas);
-      
+      //console.log(parejas); 
       
       gruposDeParejas[g] = [];
 
@@ -693,7 +673,6 @@ exports.nextRound = async (req,res,next) => {
           p.grupoActual = j;
          await p.save();
 
-
       }
       //console.log(parejas);
 
@@ -751,7 +730,6 @@ exports.nextRound = async (req,res,next) => {
       couples.shift();
       
       }
-
   
   };
 
@@ -777,7 +755,6 @@ exports.nextRound = async (req,res,next) => {
 
     })
   
-
 };
 
 //Rondas pasadas
@@ -789,10 +766,7 @@ exports.previousRounds = async (req,res,next) => {
   let clasificacion = [];
   let grupos = [];
 
-
   for(let nRonda= 1; nRonda < tourney.rondaActual; nRonda++){
-  
-  
 
   parejasAnteriores = await tourney.getCouplePreviousRounds();
 
@@ -809,7 +783,6 @@ exports.previousRounds = async (req,res,next) => {
   grupos =  grupos.sort((a,b) => a-b);
   //console.log(grupos);
 
-  
   clasificacion[nRonda] = [];
 
   //Vamos cogiendo los resultados de las parejas en rondas anteriores divididos por grupos y los partidos de esas rondas y esos grupos
@@ -832,13 +805,12 @@ exports.previousRounds = async (req,res,next) => {
     }});
 
     //Por ejemplo metemos en la ronda 1 el grupo 0
-    //Las parejas de ronda 1 y grupo 0 estan en clasificacion[Ronda1][Grupo0][Parejas, Partidos]
+    //Las parejas de ronda 1 y grupo 0 estan en clasificacion[Ronda1][Grupo0][ArrayParejas, ArrrayPartidos]
     
     clasificacion[nRonda][g]=[];
     clasificacion[nRonda][g].push(parejasGrupo);
     clasificacion[nRonda][g].push(partidosGrupo);
     console.log(clasificacion[nRonda]);
-
   }
 
 }

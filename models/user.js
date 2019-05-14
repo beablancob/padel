@@ -10,9 +10,10 @@ module.exports = (sequelize, DataTypes) => {
     password: {
       type:DataTypes.STRING,
       allowNull: false,
-      
     },
-    name: DataTypes.STRING
+    name: DataTypes.STRING,
+    apellidos: DataTypes.STRING,
+
   }, {});
   user.associate = function(models) {
     
@@ -22,3 +23,4 @@ module.exports = (sequelize, DataTypes) => {
   };
   return user;
 };
+

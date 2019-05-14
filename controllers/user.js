@@ -71,9 +71,6 @@ exports.getTournament = async (req, res, next) => {
     
     return res.status(200).json({tournament: tourney});
 
-
-
-
 };
 
 exports.editResultPartido = async(req, res, next) => {
@@ -102,8 +99,6 @@ exports.editResultPartido = async(req, res, next) => {
   if(Object.keys(sets).length != 6){
     return res.status(400).json({error: "El numero de sets total no es correcto"})
   }
-
-  
 
   for(set of sets) {
     if(set == null ){
@@ -146,15 +141,12 @@ exports.editResultPartido = async(req, res, next) => {
     match.ganador = match.couple2Id;
   }
 
-  
-
-  
     //Poner que pareja ha editado el partido
     match.coupleEditedId = req.couple.id;
     console.log(match.coupleEditedId);
 
 
-  //No ponemos true en este metodo si en confirmar
+  //No ponemos true en este metodo, si en confirmar
   //partido.jugado = true;
   //Una vez añadido el resultado lo guardamos en la bbdd
   await match.save();
@@ -183,15 +175,10 @@ exports.confirmResultPartido = async(req, res, next) => {
         
     }
 
-    return res.status(400).json({error:"Tiene que confirmar un miembro de la otra pareja el resultado"}) 
-        
+    return res.status(400).json({error:"Tiene que confirmar un miembro de la otra pareja el resultado"});       
 
-        
-        
+};
 
-        
-       
-        
-        
-
+exports.userEdit = async(req, res, next) => {
+    
 };

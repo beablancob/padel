@@ -18,7 +18,7 @@ exports.preSignUp = (req, res, next) => {
             res.status(500).json("Email en uso");
             return;
         }
-        console.log("aaa");
+        
         next();
 
     })
@@ -207,10 +207,6 @@ exports.isPlayerPartido = async (req, res, next) => {
     }
 
     return res.status(400).json({error:"Usted no jugó este partido"});
-
-
-
-
 
 };
 

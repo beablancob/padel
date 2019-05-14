@@ -132,11 +132,6 @@ app.put('/partido/:partidoId/confirmResult', userRouter);
 
 
 
-
-
-
-
-
 app.use('/', indexRouter);
 
 // catch 404 and forward to error handler
