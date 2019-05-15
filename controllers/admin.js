@@ -502,7 +502,7 @@ exports.nextRound = async (req,res,next) => {
             continue;
         }
 
-        //Si no esta confirmado, confirmarlo y sumar actualizar parejas
+        //Si no esta confirmado, confirmarlo y  actualizar valores de parejas
         if(p.jugado != true && p.coupleEditedId != null){
 
             match = p;
@@ -564,9 +564,6 @@ exports.nextRound = async (req,res,next) => {
    couple2.setsGanados = couple2.setsGanados + 1;
  }
 
-  
-
-    
   //Actualizar partidos ganados y partidos perdidos 
   if(juegospareja1 > juegospareja2){
     couple1.partidosGanados = couple1.partidosGanados + 1;
@@ -584,8 +581,8 @@ exports.nextRound = async (req,res,next) => {
     couple1.partidosPerdidos = couple1.partidosPerdidos + 1;
     couple2.partidosGanados = couple2.partidosGanados + 1;
 
-    couple1.puntos = couple1.puntos + tourney.puntosPG;
-    couple2.puntos = couple2.puntos + tourney.puntosPP;
+    couple1.puntos = couple1.puntos + tourney.puntosPP;
+    couple2.puntos = couple2.puntos + tourney.puntosPG;
 
   }
 
@@ -676,9 +673,7 @@ exports.nextRound = async (req,res,next) => {
       //Primer grupo no sube ninguna
       if(g == 0){
         parejasQueBajan = parejasQueBajan.concat(gruposDeParejas[g].slice(-(tourney.parejasSuben)));
-        for(p of parejasQueBajan){
-       //console.log(p.id);
-      }
+        
        continue;
       }
       
@@ -898,7 +893,6 @@ exports.previousRounds = async (req,res,next) => {
 }
 
 return res.status(200).json({clasificacion: clasificacion});
-
 
 }
 
