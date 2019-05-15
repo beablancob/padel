@@ -81,7 +81,6 @@ app.post('/signup', authRouter);
 //Obtener rondas anteriores
 app.get('/admin/tournament/:tournamentId/previousRounds', adminRouter);
 
-
 //Avanzar ronda
 app.put('/admin/tournament/:tournamentId/nextRound', adminRouter);
 
@@ -104,7 +103,6 @@ app.put('/admin/tournament/:tournamentId/edit', adminRouter);
 app.put('/admin/tournament/:tournamentId/addCouple', adminRouter);
 
 //Eliminar torneo
-
 app.delete('/admin/tournament/:tournamentId', adminRouter);
 
 //Crear torneo
@@ -114,7 +112,6 @@ app.post('/admin/tournament', adminRouter);
 app.get('/admin/tournaments', adminRouter);
 
 //Obetener un torneo
-
 app.get('/admin/tournament/:tournamentId',adminRouter);
 
 //USER

@@ -65,6 +65,7 @@ exports.postSignIn = (req,res,next) => {
             return res.json({msg: "Contraseña incorrecta"});
         }
 
+        //Secreto importarlo desde .config por ejemplo
         const token = jwt.sign({user: user}, "secreto", {
             expiresIn: 24 * 60 * 1000
 

@@ -32,6 +32,4 @@ router.put('/tournament/register/:registerLink', authController.verifyToken, use
 
 
 
-
-
 module.exports = router;

@@ -84,6 +84,10 @@ exports.editResultPartido = async(req, res, next) => {
         id: req.params.partidoId
     }});
 
+    if(match.jugado == true){
+        return res.status(400).json({error:"El resultado ya fue confirmado"});
+    }
+
     tourney = await tournament.findOne({where:
     {
         id: match.tournamentId
@@ -250,10 +254,7 @@ exports.tournamentRegister = async(req, res, next) => {
         return res.status(400).json({error:"Ya está registrado en este torneo", couple:coup})
     }
 
-    
-
-    
-
+ 
     //Creamos la pareja de ese torneo
     if(req.body.emailUser2){
 
@@ -279,8 +280,7 @@ exports.tournamentRegister = async(req, res, next) => {
 
         }
 
-
-        c= await couple.create({
+        c = await couple.create({
             tournamentId: tourney.id,
             user1Id: req.userId,
             user2Id: user2.id

@@ -8,8 +8,7 @@ const authController = require('../controllers/auth');
 // POST REGISTRO
 router.post('/signup', authController.preSignUp, authController.postSignup);
 
-// POST SIGN IN
-
+// POST SIGNIN
 router.post('/signin', authController.postSignIn);
 
 

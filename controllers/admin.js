@@ -46,7 +46,7 @@ exports.getTournaments = (req, res, next) => {
 
 };
 
-//eliminar torneo
+//Eliminar torneo
 
 exports.deleteTournament = (req, res, next) => {
     tournamentId = req.params.tournamentId;
@@ -66,6 +66,7 @@ exports.deleteTournament = (req, res, next) => {
 };
 
 // Obtener datos de torneo que soy admin
+
 exports.getTournament = (req,res,next) => {
     tournament.findOne({
         where: {
@@ -185,6 +186,7 @@ exports.editTournament = async (req, res, next) => {
 };
 
 //Dar inicio a la primera ronda de un torneo
+
 exports.startTournament = async (req, res, next) => {
 
 
@@ -314,6 +316,7 @@ exports.startTournament = async (req, res, next) => {
     
 };
 
+//Editar resultado de un pardio
 exports.editResult = async (req, res, next) => {
     
   const tourney = await tournament.findById(req.params.tournamentId);
