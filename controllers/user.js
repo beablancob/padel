@@ -216,8 +216,15 @@ u.password = req.body.password || u.password;
 
 u.save();
 
-return res.status(201).json({edited: true});
-//Enviar nuevo token?? ya que en el token estan los datos del user y si se mantiene el token los valores no concuerdan
+//Crear nuevo token
+const newToken = await jwt.sign({user: u}, "secreto", {
+    expiresIn: 24 * 60 * 1000
+
+});
+
+
+
+return res.status(201).json({edited: true, newToken: newToken });
     
 
 

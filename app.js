@@ -42,28 +42,7 @@ app.use((req, res, next) => {
 
 
 
-// tournament.findOne()
-// .then(tournament => {
-//   tournament.getCouples().then(
-//     couples => {
-//       console.log(JSON.stringify(couples).split("},{"));
-//     }
-//   )
-  
-// }
 
-//)
-
-async function  aaa(){
-
-
-
-
-
-
-}
-
-aaa();
 
 
 
