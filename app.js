@@ -69,6 +69,9 @@ app.put('/admin/tournaments/:tournamentId/partidos/:partidoId', adminRouter);
 // Eliminar pareja de un torneo
 app.delete('/admin/tournaments/:tournamentId/couples/:coupleId', adminRouter);
 
+// Eliminar pareja de un torneo
+app.put('/admin/tournaments/:tournamentId/couples/:coupleId', adminRouter);
+
 // Dar comienzo a un torneo
 app.put('/admin/tournaments/:tournamentId/start', adminRouter);
 
@@ -108,12 +111,13 @@ app.put('/users', userRouter);
 app.delete('/users', userRouter);
 
 //Obtener torneos publicos 
-
 app.get('/tournaments/publicos', userRouter);
 
 //Obtener datos de un torneo
-
 app.get('/tournaments/:tournamentId', userRouter);
+
+//Eliminar pareja a la que pertenezco
+app.delete('/couples/:coupleId', userRouter);
 
 //Editar resultado de un partido
 app.put('/partidos/:partidoId', userRouter);

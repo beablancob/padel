@@ -126,6 +126,8 @@ exports.putAddCouple = (req, res, next) => {
               
             }
 
+
+
         }).then(() => {
 
             couple.create({
@@ -924,6 +926,60 @@ exports.previousRounds = async (req,res,next) => {
 return res.status(200).json({clasificacion: clasificacion});
 
 }
+
+exports.editCouple = async(req, res) => {
+
+  if(req.tourney.rondaActual != 0){
+    return res.status(401).json({error: "El torneo ya ha empezado"});
+  }
+
+  if(!req.params.coupleId){
+    return res.status(400).json({error:"No envío el id de la pareja"});
+  }
+
+  c = await couple.findById(req.params.coupleId);
+
+  if(c){
+    if(c.tournamentId == req.params.tournamentId){
+      
+      user1 = await user.findOne({where:{
+        email: req.body.emailUser1.trim().toLowerCase()
+      }});
+
+      if(!user1){
+        return res.status(400).json({error: "No existe ningún usuario con ese email1"});
+      }
+
+      user2 = await user.findOne({where:{
+        email: req.body.emailUser2.trim().toLowerCase()
+      }});
+
+      if(!user2){
+        return res.status(400).json({error: "No existe ningún usuario con ese email2"});
+      }
+
+      pareja = await couple.findOne({where:
+        {
+            [Op.or]: [{user1Id:user1.id}, {user2Id:user1.id} ,{user1Id:user2.id}, {user2Id:user2.id}],
+              tournamentId: req.params.tournamentId
+        }});
+      
+        if(pareja){
+          return res.status(403).json({error: "Uno de los 2 jugadores ya está inscrito"})
+        }
+        
+      
+      c.user1Id = user1.id;
+      c.user2Id = user2.id;
+      c.save();
+      
+      return res.status(200).json({edited: "true", couple: c});
+
+    }
+  }
+
+  return res.status(400).json({error:"No exite una pareja con ese id"})
+};
 
 
 

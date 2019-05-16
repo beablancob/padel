@@ -103,7 +103,7 @@ exports.verifyToken = (req,res, next) => {
 
     jwt.verify(token, "secreto", (err, decoded) => {
         if(err){
-            return res.status(400).json({msg: "El token no es válido"});
+            return res.status(400).json({error: "El token no es válido"});
         }
         req.userId = decoded.user.id;
         req.user = decoded.user;
@@ -126,14 +126,14 @@ exports.isAdmin = (req, res, next) => {
     .then(tournament => {
         if(!tournament){
 
-            return res.status(404).json({msg: 'El id del torneo que busca no existe'});
+            return res.status(404).json({error: 'El id del torneo que busca no existe'});
         
         } else if( tournament.adminId !== req.userId){
 
-            return res.status(403).json({msg: 'Usted no es el administrador de este torneo'});
+            return res.status(403).json({error: 'Usted no es el administrador de este torneo'});
 
         }
-        
+        req.tourney = tournament;
         next();
 
     })

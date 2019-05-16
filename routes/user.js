@@ -33,6 +33,7 @@ router.put('/partidos/:partidoId/confirmResult', authController.verifyToken, aut
 //Registrarse en un torneo
 router.post('/tournaments/:registerLink/couples', authController.verifyToken, userController.tournamentRegister);
 
-
+//Eliminar pareja a la que pertenezco
+router.delete('/couples/:coupleId', authController.verifyToken, userController.deleteCouple);
 
 module.exports = router;

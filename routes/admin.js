@@ -28,6 +28,9 @@ router.delete('/admin/tournaments/:tournamentId/couples/:coupleId', authControll
 // Obtener datos de un torneo que soy admin
 router.get('/admin/tournaments/:tournamentId', authController.verifyToken, adminController.getTournament);
 
+//Editar pareja de la que soy admin
+router.put('/admin/tournaments/:tournamentId/couples/:coupleId', authController.verifyToken, authController.isAdmin, adminController.editCouple);
+
 //Eliminar torneo que soy admin
 router.delete('/admin/tournaments/:tournamentId', authController.verifyToken, adminController.deleteTournament);
 

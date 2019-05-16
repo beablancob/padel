@@ -59,7 +59,7 @@ for(p of parejasQueEstoy){
  }
 });
 
-return res.status(200).json({tournamets: torneosQueEstoy});
+return res.status(200).json({tournaments: torneosQueEstoy, couples: parejasQueEstoy});
     };
 
 //Obtener datos torneo
@@ -69,7 +69,9 @@ exports.getTournament = async (req, res, next) => {
     tourney = await tournament.findOne({where:
     {
         id:req.params.tournamentId
-    }});
+    }, include:[couple]
+
+});
     
     
     return res.status(200).json({tournament: tourney});
@@ -367,4 +369,24 @@ exports.deleteUser = async(req,res) => {
 
 };
 
+ exports.deleteCouple = async(req, res) => {
+
+    if(!req.params.coupleId){
+        return res.status(400).json({error: "No envío el id de ninguna pareja"});
+    }
+
+    c = await couple.findById(req.params.coupleId);
+
+    if(c){
+        tourney = await tournament.findById(c.tournamentId);
+
+        if((c.user1Id == req.userId || c.user2Id == req.userId) && tourney.rondaActual == 0){
+            c.destroy();
+            return res.status(200).json({deleted: "true"});
+        }
+        return res.status(400).json({error: "La pareja no es suya"});
+    }
+    return res.status(400).json({error: "No existe la pareja"});
+
+ };
 
