@@ -10,7 +10,7 @@ exports.getPublicTournaments = (req, res, next) => {
 
     tournament.findAll({
         where: {
-            rondaActual: 0,
+            
             publico: true
 
         }
@@ -59,7 +59,7 @@ for(p of parejasQueEstoy){
  }
 });
 
-return res.status(400).json({tournamets: torneosQueEstoy});
+return res.status(200).json({tournamets: torneosQueEstoy});
     };
 
 //Obtener datos torneo
@@ -70,6 +70,7 @@ exports.getTournament = async (req, res, next) => {
     {
         id:req.params.tournamentId
     }});
+    
     
     return res.status(200).json({tournament: tourney});
 
@@ -95,7 +96,7 @@ exports.editResultPartido = async(req, res, next) => {
 
     //Ver que modificamos un partido de la ronda actual
     if(tourney.rondaActual != match.numeroRonda){
-        return res.status(400).json({error:"No puedes modificar un resultado de una ronda anterior"});
+        return res.status(400).json({error:"No puedes modificar un resultado de una ronda que no es la actual"});
     }
 
     const sets = req.body.sets;
@@ -158,7 +159,7 @@ exports.editResultPartido = async(req, res, next) => {
   await match.save();
 
  //Devolvemos el partido con los datos actualizados
-    return res.status(200).json({partido: match})
+    return res.status(200).json({edited:"true",partido: match})
 
 
 
@@ -181,16 +182,17 @@ exports.confirmResultPartido = async(req, res, next) => {
     if(req.couple.id != match.coupleEditedId){
         
 
-
+        match.jugado = true;
+        match.save();
 
 
         
 
-        return res.status(200).json({confirm: "true", partido: match});
+        return res.status(200).json({confirmed: "true", partido: match});
         
     }
 
-    return res.status(400).json({error:"Tiene que confirmar un miembro de la otra pareja el resultado"});       
+    return res.status(401).json({error:"Tiene que confirmar un miembro de la otra pareja el resultado"});       
 
 };
 
@@ -202,14 +204,17 @@ exports.editInfo = async(req, res, next) => {
     id: req.userId
     }});
 
+    if(!req.body.password1 || !req.body.password2 || req.body.password1 != req.body.password2){
+        return res.status(400).json({error:"Fallo en las contraseñas"})
+    }
+
     //Si envia password encriptarlo con bcrypt
     if(req.body.password){
-    console.log("se ejecuta");
     req.body.password = await bcrypt.hashSync(req.body.password,10);
     }
 
 
-u.email = req.body.email || u.email;
+u.email = (req.body.email || u.email).trim().toLowerCase();
 u.name = req.body.name || u.name;
 u.apellidos = req.body.apellidos || u.apellidos;
 u.password = req.body.password || u.password;
@@ -224,7 +229,7 @@ const newToken = await jwt.sign({user: u}, "secreto", {
 
 
 
-return res.status(201).json({edited: true, newToken: newToken });
+return res.status(200).json({edited: true,user: u, newToken: newToken });
     
 
 
@@ -244,7 +249,7 @@ exports.tournamentRegister = async(req, res, next) => {
         
     }
     if(tourney.rondaActual != 0){
-        return res.status(400).json({error: "El torneo ya ha comenzado"})
+        return res.status(403).json({error: "El torneo ya ha comenzado"})
     }
 
     //Vemos si ya estamos registrados en el torneo
@@ -258,7 +263,7 @@ exports.tournamentRegister = async(req, res, next) => {
 
     //Si estamos registrados devolver la pareja
     if(coup){
-        return res.status(400).json({error:"Ya está registrado en este torneo", couple:coup})
+        return res.status(403).json({error:"Ya está registrado en este torneo", couple:coup})
     }
 
  
@@ -276,14 +281,14 @@ exports.tournamentRegister = async(req, res, next) => {
 
         coup2 = await couple.findOne({where:{
             tournamentId: tourney.id,
-            [Op.or]: [{user1Id: user2.id}, {user2Id: req.user2.id}]
+            [Op.or]: [{user1Id: user2.id}, {user2Id: user2.id}]
     
         }
     
         })
         
         if(coup2){
-            return res.status(400).json({error:"Su compañero ya esta registrado"});
+            return res.status(400).json({error:"Su compañero ya está registrado"});
 
         }
 
@@ -348,6 +353,17 @@ exports.getRondaInfo = async(req, res, next) => {
     return res.status(200).json({parejas: parejas, partidos:partidos })
 
     
+
+};
+
+exports.deleteUser = async(req,res) => {
+
+    u = await user.findOne({where: {
+        id: req.userId
+    }});
+    u.destroy();
+
+    return res.status(200).json({deleted: true});
 
 };
 

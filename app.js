@@ -58,54 +58,56 @@ app.post('/signup', authRouter);
 //ADMIN
 
 //Obtener rondas anteriores
-app.get('/admin/tournament/:tournamentId/previousRounds', adminRouter);
+app.get('/admin/tournaments/:tournamentId/previousRounds', adminRouter);
 
 //Avanzar ronda
-app.put('/admin/tournament/:tournamentId/nextRound', adminRouter);
+app.post('/admin/tournaments/:tournamentId/nextRound', adminRouter);
 
 //Editar resultado de un partido
-app.put('/admin/tournament/:tournamentId/partido/:partidoId/edit', adminRouter);
+app.put('/admin/tournaments/:tournamentId/partidos/:partidoId', adminRouter);
 
 // Eliminar pareja de un torneo
-
-app.delete('/admin/tournament/:tournamentId/deleteCouple/:coupleId', adminRouter);
+app.delete('/admin/tournaments/:tournamentId/couples/:coupleId', adminRouter);
 
 // Dar comienzo a un torneo
+app.put('/admin/tournaments/:tournamentId/start', adminRouter);
 
-app.put('/admin/tournament/:tournamentId/start', adminRouter);
+//Añadir pareja a un torneo
+app.post('/admin/tournaments/:tournamentId/couples', adminRouter);
 
 //Editar torneo que soy admin si no esta empezado
 
-app.put('/admin/tournament/:tournamentId/edit', adminRouter);
-
-//Añadir pareja a un torneo
-app.put('/admin/tournament/:tournamentId/addCouple', adminRouter);
+app.put('/admin/tournaments/:tournamentId', adminRouter);
 
 //Eliminar torneo
-app.delete('/admin/tournament/:tournamentId', adminRouter);
+app.delete('/admin/tournaments/:tournamentId', adminRouter);
 
 //Crear torneo
-app.post('/admin/tournament', adminRouter);
+app.post('/admin/tournaments', adminRouter);
+
+//Obetener un torneo
+app.get('/admin/tournaments/:tournamentId',adminRouter);
 
 //Obtener torneos que soy admin
 app.get('/admin/tournaments', adminRouter);
 
-//Obetener un torneo
-app.get('/admin/tournament/:tournamentId',adminRouter);
+
 
 //USER
 
 //Obtener una ronda en concreto
-app.get('/tournament/:tournamentId/ronda/:numeroRonda', userRouter);
-
-//Editar datos de usuario
-
-app.put('/user/editInfo', userRouter);
+app.get('/tournaments/:tournamentId/ronda/:numeroRonda', userRouter);
 
 //Obtener torneos en los que juego
-app.get('/tournaments/myTournaments', userRouter);
+app.get('/users', userRouter);
 
-//Obtener torneos publicos que no han empezado
+//Editar datos de usuario
+app.put('/users', userRouter);
+
+//Eliminar cuenta
+app.delete('/users', userRouter);
+
+//Obtener torneos publicos 
 
 app.get('/tournaments/publicos', userRouter);
 
@@ -114,14 +116,13 @@ app.get('/tournaments/publicos', userRouter);
 app.get('/tournaments/:tournamentId', userRouter);
 
 //Editar resultado de un partido
-app.put('/partido/:partidoId/editResult', userRouter);
+app.put('/partidos/:partidoId', userRouter);
 
 //Confirmar resultado
-app.put('/partido/:partidoId/confirmResult', userRouter);
+app.put('/partidos/:partidoId/confirmResult', userRouter);
 
 //Registrarse en un torneo que aun no ha comenzado con enlace
-app.put('/tournament/register/:registerLink', userRouter);
-
+app.post('/tournaments/:registerLink/couples', userRouter);
 
 
 

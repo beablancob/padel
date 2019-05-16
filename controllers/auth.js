@@ -15,7 +15,7 @@ exports.preSignUp = (req, res, next) => {
     })
     .then(user => {
         if (user){
-            res.status(500).json("Email en uso");
+            res.status(409).json({error: "Email en uso"});
             return;
         }
         
@@ -30,18 +30,26 @@ exports.preSignUp = (req, res, next) => {
 
 exports.postSignup = (req, res, next) => {
 
+    if(!req.body.email){
+        return res.status(500).json({error: "Falta el email"});
+    }
+
+    if(!req.body.password){
+        return res.status(500).json({error: "Falta la contraseña"});
+    }
+
     user.create({
-        name: req.body.name,
+        name: req.body.name.trim().toLowerCase(),
         apellidos: req.body.apellidos,
         email:req.body.email,
         password: bcrypt.hashSync(req.body.password,10)
 
     })
     .then(user => {
-        res.json({msg: "registrado con exito"});
+        return res.status(201).json({msg: "Registrado con éxito", user: user});
     })
     .catch(err => {
-        res.json({error: err});
+        return res.status(500).json({error: err});
     })
 };
 
@@ -62,7 +70,7 @@ exports.postSignIn = (req,res,next) => {
         
         const validPassword = bcrypt.compareSync(req.body.password, user.password);
         if(!validPassword) {
-            return res.json({msg: "Contraseña incorrecta"});
+            return res.status(401).json({msg: "Contraseña incorrecta"});
         }
 
         //Secreto importarlo desde .config por ejemplo
@@ -71,12 +79,12 @@ exports.postSignIn = (req,res,next) => {
 
         });
 
-        res.json({authenticated: true, token: token});
+       return res.status(200).json({authenticated: true, token: token});
 
 
     })
     .catch(err => {
-        res.json({error: err});
+        return res.status(500).json({error: err});
     })
 
 };
@@ -87,15 +95,15 @@ exports.verifyToken = (req,res, next) => {
     const token = req.headers['x-access-token'];
 
     if (!token) {
-        return res.json({
-            msg:"No enviaste ningún token"
+        return res.status(400).json({
+            error:"No enviaste ningún token"
         })
     }
 
 
     jwt.verify(token, "secreto", (err, decoded) => {
         if(err){
-            return res.json({msg: "El token no es válido"});
+            return res.status(400).json({msg: "El token no es válido"});
         }
         req.userId = decoded.user.id;
         req.user = decoded.user;
@@ -122,15 +130,16 @@ exports.isAdmin = (req, res, next) => {
         
         } else if( tournament.adminId !== req.userId){
 
-            return res.status(404).json({msg: 'Usted no es el administrador de este torneo'});
+            return res.status(403).json({msg: 'Usted no es el administrador de este torneo'});
 
         }
-        console.log("pasa pora aqui?");
+        
         next();
 
     })
-    .catch(err => console.log(err));
-
+    .catch(err => {
+        return res.status(500).json({error: err});
+    })
 
 };
 
@@ -168,7 +177,7 @@ exports.isPlayerTournament = async (req, res, next) => {
         return next();
     }
 
-    return res.status(400).json({error: "Usted no pertenece a este torneo"});
+    return res.status(401).json({error: "Usted no pertenece a este torneo"});
 
 
 };
@@ -211,7 +220,7 @@ exports.isPlayerPartido = async (req, res, next) => {
         return next();
     }
 
-    return res.status(400).json({error:"Usted no jugó este partido"});
+    return res.status(403).json({error:"Usted no jugó este partido"});
 
 };
 

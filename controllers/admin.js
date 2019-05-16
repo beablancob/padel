@@ -7,7 +7,7 @@ const Op = Sequelize.Op;
 
 //Crear torneo
 exports.postTournament = (req,res,next) => {
-    const name = req.body.name;
+    const name = req.body.name || ("Torneo de " + req.user.name);
     const numberCouples = req.body.numberCouples;
     user.findById(req.userId)
     .then(user => {
@@ -59,7 +59,7 @@ exports.deleteTournament = (req, res, next) => {
         if(a){
         return res.status(201).json({msg: "Torneo eliminado"})}
         else{
-            return res.status(201).json({msg: "No es el admin de este torneo o ya fue eliminado"})
+            return res.status(201).json({error: "El torneo ya fue eliminado"})
         }
     }).catch(err => console.log(err));
 
@@ -78,7 +78,7 @@ exports.getTournament = (req,res,next) => {
         if(tournament && tournament.adminId === req.userId){
         res.status(200).json({msg: 'Correcto', tournament: tournament});}
         else {
-            res.status(400).json({msg: 'El torneo no existe o no es usted admin'})
+            res.status(400).json({error: 'El torneo no existe o no es usted admin'})
         }
     })
     .catch(err => {
@@ -121,6 +121,11 @@ exports.putAddCouple = (req, res, next) => {
     
             req.user2Id = user.id;
 
+            if(req.user1Id == req.user2Id){
+              return res.status(403).json({error: "Los 2 miembros de la pareja son el mismo usuario"});
+              
+            }
+
         }).then(() => {
 
             couple.create({
@@ -149,13 +154,22 @@ exports.putAddCouple = (req, res, next) => {
 
 // Eliminar pareja de torneo del que soy admin
 
-exports.deleteCouple = (req, res, next) => {
+exports.deleteCouple = async(req, res, next) => {
+
+  tourney = await tournament.findOne({where:
+  {id:req.params.tournamentId
+  }
+  });
+
+  if(tourney && tourney.rondaActual != 0){
+    return res.status(403).json({error: "El torneo ya está empezado"});
+  }
     
     couple.findById(req.params.coupleId)
     .then(couple => {
 
 
-        if(couple && couple.tournamentId == req.params.tournamentId){
+        if(couple && couple.tournamentId == req.params.tournamentId  ){
             
             couple.destroy()
             .then(couple => {
@@ -163,7 +177,7 @@ exports.deleteCouple = (req, res, next) => {
                  return res.json({msg: 'Pareja eliminada correctamente'});
             })
         }else {
-            return res.json({msg: 'La pareja no es suya'});
+            return res.json({error: 'La pareja no pertenece a su torneo'});
         } 
     })
     .catch(err => console.log(err));
@@ -175,13 +189,21 @@ exports.editTournament = async (req, res, next) => {
 
     if(t.rondaActual == 0){
         t.update({
-            name: req.body.name 
+          name: req.body.name || t.name,
+          numberCouples: req.body.numberCouples || t.numberCouples,
+          parejasPorGrupo: req.body.parejasPorGrupo || t.parejasPorGrupo,
+          publico:req.body.publico || t.publico,
+          puntosPG:req.body.puntosPG || t.puntosPG,
+          puntosPP: req.body.puntosPP || t.puntosPP,
+          idaYvuelta: req.body.idaYvuelta || t.idaYvuelta,
+          numeroRondas: req.body.numeroRondas || t.numeroRondas,
+          parejasSuben: req.body.parejasSuben || t.parejasSuben
         })
     }else {
         return res.json("El torneo ya está en curso");
     }
     
-    return res.json({tournament: t});
+    return res.json({msg: "Torneo editado con éxito", tournament: t});
 
 };
 
@@ -489,7 +511,7 @@ exports.nextRound = async (req,res,next) => {
     });
 
     if(tourney.rondaActual == 0 || tourney.rondaActual == tourney.numeroRondas){
-        return res.status(400).json({error: "El torneo aun no ha comenzado o está en la ultima ronda"});
+        return res.status(400).json({error: "El torneo aun no ha comenzado o está en la última ronda"});
       }
 
     // Coger grupos de los partidos
@@ -843,6 +865,10 @@ exports.previousRounds = async (req,res,next) => {
     
   tourney = await tournament.findById(req.params.tournamentId);
 
+  if(tourney.rondaActual == 0){
+    return res.status(400).json({error:"El torneo aún no ha comenzado"});
+  }
+
   let clasificacion = [];
   let grupos = [];
 
@@ -886,7 +912,7 @@ exports.previousRounds = async (req,res,next) => {
 
     //Por ejemplo metemos en la ronda 1 el grupo 0
     //Las parejas de ronda 1 y grupo 0 estan en clasificacion[Ronda1][Grupo0][ArrayParejas, ArrrayPartidos]
-    
+    //Clasificacion[0] es null ya que empieza desde la ronda 1
     clasificacion[nRonda][g]=[];
     clasificacion[nRonda][g].push(parejasGrupo);
     clasificacion[nRonda][g].push(partidosGrupo);

@@ -7,28 +7,31 @@ const userController = require('../controllers/user');
 
 
 //Obtener una ronda de un torneo que juego o es publico
-router.get('/tournament/:tournamentId/ronda/:numeroRonda', authController.verifyToken, authController.isPlayerTournament, userController.getRondaInfo);
+router.get('/tournaments/:tournamentId/ronda/:numeroRonda', authController.verifyToken, authController.isPlayerTournament, userController.getRondaInfo);
 
 //Obtener los torneos que estoy inscrito
-router.get('/tournaments/myTournaments', authController.verifyToken, userController.getMyTournaments);
+router.get('/users', authController.verifyToken, userController.getMyTournaments);
 
-//Obtener torneos publicos sin empezar
+//Editar info usuario
+router.put('/users', authController.verifyToken, userController.editInfo);
+
+//Eliminar cuenta propia
+router.delete('/users', authController.verifyToken, userController.deleteUser);
+
+//Obtener torneos publicos 
 router.get('/tournaments/publicos', authController.verifyToken, userController.getPublicTournaments);
 
 //Obtener datos de un torneo
 router.get('/tournaments/:tournamentId', authController.verifyToken, authController.isPlayerTournament, userController.getTournament);
 
 //Editar resultado de un partido
-router.put('/partido/:partidoId/editResult', authController.verifyToken, authController.isPlayerPartido, userController.editResultPartido );
+router.put('/partidos/:partidoId', authController.verifyToken, authController.isPlayerPartido, userController.editResultPartido );
 
 //Confirmar resultado de un partido
-router.put('/partido/:partidoId/confirmResult', authController.verifyToken, authController.isPlayerPartido, userController.confirmResultPartido);
-
-//Editar info usuario
-router.put('/user/editInfo', authController.verifyToken, userController.editInfo);
+router.put('/partidos/:partidoId/confirmResult', authController.verifyToken, authController.isPlayerPartido, userController.confirmResultPartido);
 
 //Registrarse en un torneo
-router.put('/tournament/register/:registerLink', authController.verifyToken, userController.tournamentRegister);
+router.post('/tournaments/:registerLink/couples', authController.verifyToken, userController.tournamentRegister);
 
 
 
