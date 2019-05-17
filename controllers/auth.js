@@ -54,7 +54,7 @@ exports.postSignup = (req, res, next) => {
         name: req.body.name.trim().toLowerCase() || "",
         apellidos: req.body.apellidos,
         email:req.body.email,
-        password: bcrypt.hashSync(req.body.password,10)
+        password: bcrypt.hashSync(req.body.password1,10)
 
     })
     .then(user => {
