@@ -34,12 +34,24 @@ exports.postSignup = (req, res, next) => {
         return res.status(500).json({error: "Falta el email"});
     }
 
-    if(!req.body.password){
+    if(!req.body.password1 || !req.body.password2){
         return res.status(500).json({error: "Falta la contraseña"});
     }
 
+    if(req.body.password1 != req.body.password2){
+        return res.status(400).json({error:"Las contraseñas no coinciden"});
+    }
+
+    if(!req.body.name){
+        return res.status(500).json({error: "Falta el nombre"});
+    }
+
+    if(!req.body.apellidos){
+        return res.status(500).json({error: "Faltan los apellidos"});
+    }
+
     user.create({
-        name: req.body.name.trim().toLowerCase(),
+        name: req.body.name.trim().toLowerCase() || "",
         apellidos: req.body.apellidos,
         email:req.body.email,
         password: bcrypt.hashSync(req.body.password,10)

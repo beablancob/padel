@@ -53,7 +53,7 @@ app.post('/signin', authRouter);
 
 //REGISTRO
 
-app.post('/signup', authRouter);
+app.post('/users', authRouter);
 
 //ADMIN
 
@@ -78,7 +78,7 @@ app.put('/admin/tournaments/:tournamentId/start', adminRouter);
 //Añadir pareja a un torneo
 app.post('/admin/tournaments/:tournamentId/couples', adminRouter);
 
-//Editar torneo que soy admin si no esta empezado
+//Editar torneo que soy admin si no está empezado
 
 app.put('/admin/tournaments/:tournamentId', adminRouter);
 

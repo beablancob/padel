@@ -6,7 +6,7 @@ const authController = require('../controllers/auth');
 
 
 // POST REGISTRO
-router.post('/signup', authController.preSignUp, authController.postSignup);
+router.post('/users', authController.preSignUp, authController.postSignup);
 
 // POST SIGNIN
 router.post('/signin', authController.postSignIn);
