@@ -32,6 +32,14 @@ exports.getPublicTournaments = (req, res, next) => {
 //Obtener torneos en los que estoy inscrito o estoy jugando
  exports.getMyTournaments = async (req, res, next) => {
 
+    if(!req.params.userId){
+        return res.status(400).json({error:"No envió el id de usuario"})
+    }
+
+    if(req.params.userId != req.userId){
+        return res.status(403).json({error:"El id de usuario no es el suyo"})
+    }
+
 //     //Cojo parejas en las que estoy
 const parejasQueEstoy = await couple.findAll({where:{
     [Op.or]: [{user1Id: req.userId}, {user2Id: req.userId}]
@@ -200,13 +208,20 @@ exports.confirmResultPartido = async(req, res, next) => {
 
 exports.editInfo = async(req, res, next) => {
 
+    if(!req.params.userId){
+        return res.status(400).json({error:"No envió el id de usuario"})
+    }
+
+    if(req.params.userId != req.userId){
+        return res.status(403).json({error:"El id de usuario no es el suyo"})
+    }
     
     
   u = await user.findOne({where:{
     id: req.userId
     }});
 
-    if(!req.body.password1 || !req.body.password2 || req.body.password1 != req.body.password2){
+    if(req.body.password1 && req.body.password2 && req.body.password1 != req.body.password2){
         return res.status(400).json({error:"Fallo en las contraseñas"})
     }
 
@@ -359,6 +374,14 @@ exports.getRondaInfo = async(req, res, next) => {
 };
 
 exports.deleteUser = async(req,res) => {
+
+    if(!req.params.userId){
+        return res.status(400).json({error:"No envió el id de usuario"})
+    }
+
+    if(req.params.userId != req.userId){
+        return res.status(403).json({error:"El id de usuario no es el suyo"})
+    }
 
     u = await user.findOne({where: {
         id: req.userId

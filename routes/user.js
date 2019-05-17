@@ -10,13 +10,13 @@ const userController = require('../controllers/user');
 router.get('/tournaments/:tournamentId/ronda/:numeroRonda', authController.verifyToken, authController.isPlayerTournament, userController.getRondaInfo);
 
 //Obtener los torneos que estoy inscrito
-router.get('/users', authController.verifyToken, userController.getMyTournaments);
+router.get('/users/:userId/tournaments', authController.verifyToken, userController.getMyTournaments);
 
 //Editar info usuario
-router.put('/users', authController.verifyToken, userController.editInfo);
+router.put('/users/:userId', authController.verifyToken, userController.editInfo);
 
 //Eliminar cuenta propia
-router.delete('/users', authController.verifyToken, userController.deleteUser);
+router.delete('/users/:userId', authController.verifyToken, userController.deleteUser);
 
 //Obtener torneos publicos 
 router.get('/tournaments/publicos', authController.verifyToken, userController.getPublicTournaments);

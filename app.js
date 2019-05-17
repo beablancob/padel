@@ -102,13 +102,13 @@ app.get('/admin/tournaments', adminRouter);
 app.get('/tournaments/:tournamentId/ronda/:numeroRonda', userRouter);
 
 //Obtener torneos en los que juego
-app.get('/users', userRouter);
+app.get('/users/:userId/tournaments', userRouter);
 
 //Editar datos de usuario
-app.put('/users', userRouter);
+app.put('/users/:userId', userRouter);
 
 //Eliminar cuenta
-app.delete('/users', userRouter);
+app.delete('/users/:userId', userRouter);
 
 //Obtener torneos publicos 
 app.get('/tournaments/publicos', userRouter);
