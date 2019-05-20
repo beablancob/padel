@@ -8,6 +8,9 @@ const Op = Sequelize.Op;
 
 exports.preSignUp = (req, res, next) => {
 
+    
+    
+
     user.findOne({
         where: {
             email: req.body.email
@@ -51,9 +54,9 @@ exports.postSignup = (req, res, next) => {
     }
 
     user.create({
-        name: req.body.name.trim().toLowerCase() || "",
+        name: req.body.name.trim() || "",
         apellidos: req.body.apellidos,
-        email:req.body.email,
+        email:req.body.email.toLowerCase(),
         password: bcrypt.hashSync(req.body.password1,10)
 
     })
@@ -68,6 +71,10 @@ exports.postSignup = (req, res, next) => {
 //POST del login de usuarios
 
 exports.postSignIn = (req,res,next) => {
+
+    if(!req.body.email){
+        return res.status(400).json({error: "No ha enviado ningún correo."})
+    }
     
     user.findOne({
         where: {
@@ -78,6 +85,9 @@ exports.postSignIn = (req,res,next) => {
 
         if (!user){
            return res.status(404).json({msg:"El correo no existe"});
+        }
+        if(!req.body.password){
+            return res.status(400).json({error:"No enviaste ningúna contraseña"});
         }
         
         const validPassword = bcrypt.compareSync(req.body.password, user.password);

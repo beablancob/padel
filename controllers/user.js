@@ -80,9 +80,25 @@ exports.getTournament = async (req, res, next) => {
     }, include:[couple]
 
 });
+
+//Obtener los nombres y los correos de los jugadores que forman las parejas
+         nombresDelTorneo = [];
+for(c of tourney.couples){
+
+    user1 = await user.findOne({where:{
+      id: c.user1Id
+    }});
+    user2 = await user.findOne({where:{
+      id: c.user2Id
+    }});
+    nombresDelTorneo.push(c.id,user1.name + " " + user1.apellidos);
+    nombresDelTorneo.push(c.id, user2.name + " " + user2.apellidos);
+
+}
+
     
     
-    return res.status(200).json({tournament: tourney});
+    return res.status(200).json({tournament: tourney,nombres:nombresDelTorneo });
 
 };
 
@@ -185,16 +201,101 @@ exports.confirmResultPartido = async(req, res, next) => {
         tourney = await tournament.findOne({where:{
         id: match.tournamentId
     }})
+
+    
     
     //Como pasamos antes el middleware de isPlayingPartido,
     //solo comprobamos que no sea el mismo id que coupleEditedId
     console.log(req.couple.id);
-    if(req.couple.id != match.coupleEditedId){
+    if(req.couple.id != match.coupleEditedId && match.jugado != true){
         
-
+        //Ponemos el partido como jugado
         match.jugado = true;
         match.save();
 
+          //Cogemos las 2 parejas y actualizamos valores
+
+        couple1 = await couple.findOne({where:{
+            id: match.couple1Id
+        }});
+      
+        couple2 = await couple.findOne({where:{
+            id: match.couple2Id
+        }});
+
+        let juegospareja1 = match.set1Couple1+match.set2Couple1+match.set3Couple1;
+        let juegospareja2 = match.set1Couple2+match.set2Couple2+match.set3Couple2;
+
+
+  //Actualizar partidos jugados
+  couple1.partidosJugados = couple1.partidosJugados + 1;
+  couple2.partidosJugados = couple2.partidosJugados + 1;
+
+  if( match.set1Couple1 > match.set1Couple2){
+    couple1.setsGanados = couple1.setsGanados + 1;
+    couple2.setsPerdidos = couple2.setsPerdidos + 1;
+    
+  } else{
+   couple1.setsPerdidos = couple1.setsPerdidos + 1;
+   couple2.setsGanados = couple2.setsGanados + 1;
+  }
+  //Set 2
+  if( match.set2Couple1 > match.set2Couple2){
+    couple1.setsGanados = couple1.setsGanados + 1;
+    couple2.setsPerdidos = couple2.setsPerdidos + 1;
+   
+ } else{
+    couple1.setsPerdidos = couple1.setsPerdidos + 1;
+   couple2.setsGanados = couple2.setsGanados + 1;
+ }
+ //Set 3
+ if( match.set3Couple1 > match.set3Couple2){
+    couple1.setsGanados = couple1.setsGanados + 1;
+    couple2.setsPerdidos = couple2.setsPerdidos + 1;
+   
+ } else{
+    couple1.setsPerdidos = couple1.setsPerdidos + 1;
+   couple2.setsGanados = couple2.setsGanados + 1;
+ }
+
+
+ //Actualizar partidos ganados y partidos perdidos 
+ if(juegospareja1 > juegospareja2){
+    match.ganador = match.couple1Id;
+    couple1.partidosGanados = couple1.partidosGanados + 1;
+    couple2.partidosPerdidos = couple2.partidosPerdidos + 1;
+
+    //Actualizar puntos
+    couple1.puntos = couple1.puntos + tourney.puntosPG;
+    couple2.puntos = couple2.puntos + tourney.puntosPP;
+
+    
+
+  }else {
+    match.ganador = match.couple2Id;
+
+    couple1.partidosPerdidos = couple1.partidosPerdidos + 1;
+    couple2.partidosGanados = couple2.partidosGanados + 1;
+
+    couple1.puntos = couple1.puntos + tourney.puntosPP;
+    couple2.puntos = couple2.puntos + tourney.puntosPG;
+
+  }
+
+  couple1.juegosGanados = couple1.juegosGanados + juegospareja1;
+  couple2.juegosGanados = couple2.juegosGanados + juegospareja2;
+  couple1.juegosPerdidos = couple1.juegosPerdidos + juegospareja2;
+  couple2.juegosPerdidos = couple2.juegosPerdidos + juegospareja1;
+  //Actualizar diferencia de sets y diferencia de juegos
+  couple1.diferenciaSets = couple1.diferenciaSets + (match.set1Couple1 + match.set2Couple1 + match.set3Couple1 - (match.set1Couple2 + match.set2Couple2 + match.set3Couple2));
+  couple2.diferenciaSets = couple2.diferenciaSets + (match.set1Couple2 + match.set2Couple2 + match.set3Couple2 - (match.set1Couple1 + match.set2Couple1 + match.set3Couple1));
+
+  couple1.diferenciaJuegos = couple1.diferenciaJuegos + (juegospareja1 - juegospareja2);
+  couple2.diferenciaJuegos = couple2.diferenciaJuegos + (juegospareja2 - juegospareja1);
+
+ //Guardamos en la bbdd
+ await couple1.save();
+ await couple2.save();
 
         
 
@@ -237,6 +338,7 @@ u.apellidos = req.body.apellidos || u.apellidos;
 u.password = req.body.password || u.password;
 
 u.save();
+
 
 //Crear nuevo token
 const newToken = await jwt.sign({user: u}, "secreto", {
@@ -346,11 +448,30 @@ exports.getRondaInfo = async(req, res, next) => {
             ['diferenciaJuegos', 'DESC']
           ]});
 
+          //Obtener los nombres y los correos de los jugadores que forman las parejas
+         nombresDelTorneo = [];
+          for(p of parejas){
+
+            user1 = await user.findOne({where:{
+              id: p.user1Id
+            }});
+            user2 = await user.findOne({where:{
+              id: p.user2Id
+            }});
+            nombresDelTorneo.push(p.id,user1.name + " " + user1.apellidos);
+            nombresDelTorneo.push(p.id, user2.name + " " + user2.apellidos);
+
+      }
+
+        
+
         partidos = await tourney.getPartidos({where:
         {
             numeroRonda: tourney.rondaActual
         }})
-        return res.status(200).json({parejas: parejas, partidos:partidos })
+
+
+        return res.status(200).json({parejas: parejas, partidos:partidos, nombres: nombresDelTorneo })
     }
 
     //Si no es la ronda actual coger las parejas de previousCouples

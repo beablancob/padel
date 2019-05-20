@@ -17,7 +17,7 @@ router.put('/admin/tournaments/:tournamentId/start',authController.verifyToken, 
 router.post('/admin/tournaments/:tournamentId/nextRound', authController.verifyToken, authController.isAdmin, adminController.nextRound);
 
 //Añadir pareja a un torneo que soy admin
-router.post('/admin/tournaments/:tournamentId/couples', authController.verifyToken, authController.isAdmin, adminController.putAddCouple);
+router.post('/admin/tournaments/:tournamentId/couples', authController.verifyToken, authController.isAdmin, adminController.addCouple);
 
 //Editar configuracion torneo que soy admin
 router.put('/admin/tournaments/:tournamentId', authController.verifyToken, authController.isAdmin, adminController.editTournament);

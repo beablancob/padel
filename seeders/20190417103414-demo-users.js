@@ -15,98 +15,112 @@ module.exports = {
     */
 
    return queryInterface.bulkInsert('users', 
-   [{
-     email: 'test1@test.com',
-     password: bcrypt.hashSync('password',10),
-     name:'test1',
+   [
+     {
+     email: 'jorge@test.com',
+     password: bcrypt.hashSync('qwerty',10),
+     name:'Jorge',
+     apellidos:'García Pérez',
      createdAt: new Date(),
      updatedAt: new Date()
 
     },
     {
-      email: 'test2@test.com',
+      email: 'juan@test.com',
       password: bcrypt.hashSync('password',10),
-      name:'test2',
+      name:'Juan',
+      apellidos: 'Ortiz Gómez',
       createdAt: new Date(),
       updatedAt: new Date()
  
      },
      {
-      email: 'test3@test.com',
+      email: 'pablo@test.com',
       password: bcrypt.hashSync('password',10),
-      name:'test4',
+      name:'Pablo',
+      apellidos: 'Romero Sánchez',
       createdAt: new Date(),
       updatedAt: new Date()
  
      },
      {
-      email: 'test4@test.com',
+      email: 'santiago@test.com',
       password: bcrypt.hashSync('password',10),
-      name:'test4',
+      name:'Santiago',
+      apellidos:'Lara Gómez',
       createdAt: new Date(),
       updatedAt: new Date()
  
      },
      {
-      email: 'test5@test.com',
+      email: 'camilo@test.com',
       password: bcrypt.hashSync('password',10),
-      name:'test5',
+      name:'Camilo',
+      apellidos:'Valdés Ortega',
       createdAt: new Date(),
       updatedAt: new Date()
  
      },
      {
-      email: 'test6@test.com',
+      email: 'mario@test.com',
       password: bcrypt.hashSync('password',10),
-      name:'test6',
+      name:'Mario',
+      apellidos:'Acosta Alonso',
       createdAt: new Date(),
       updatedAt: new Date()
  
      },
      {
-      email: 'test7@test.com',
+      email: 'belen@test.com',
       password: bcrypt.hashSync('password',10),
-      name:'test1',
+      name:'Belén',
+      apellidos:'Casto Espejo',
       createdAt: new Date(),
       updatedAt: new Date()
  
      },
      {
-      email: 'test8@test.com',
+      email: 'marta@test.com',
       password: bcrypt.hashSync('password',10),
-      name:'test8',
+      name:'Marta',
+      apellidos:'Cuevas Muñoz',
       createdAt: new Date(),
       updatedAt: new Date()
  
      },
      {
-      email: 'test9@test.com',
+      email: 'sara@test.com',
       password: bcrypt.hashSync('password',10),
-      name:'test9',
+      name:'Sara',
+      apellidos:'Crespo Collado',
       createdAt: new Date(),
       updatedAt: new Date()
  
      },
      {
-      email: 'test10@test.com',
+      email: 'alvaro@test.com',
       password: bcrypt.hashSync('password',10),
-      name:'test10',
+      name:'Álvaro',
+      apellidos:'Castañeda Turga',
       createdAt: new Date(),
       updatedAt: new Date()
  
      },
      {
-      email: 'test11@test.com',
+      email: 'irene@test.com',
       password: bcrypt.hashSync('password',10),
-      name:'test11',
+      name:'Irene',
+      apellidos:'Fernández Quintana',
       createdAt: new Date(),
       updatedAt: new Date()
  
-     },
+     }
+     ,
      {
-      email: 'test12@test.com',
+      email: 'francisco@test.com',
       password: bcrypt.hashSync('password',10),
-      name:'test12',
+      name:'Francisco',
+      apellidos:'Notario Ayuso',
       createdAt: new Date(),
       updatedAt: new Date()
  
@@ -122,3 +136,16 @@ module.exports = {
     
   }
 };
+
+
+// 'use strict';
+
+// module.exports = {
+//   up: function(queryInterface, Sequelize) {
+//     return Promise.resolve()
+//   },
+
+//   down: function(queryInterface) {
+//     return Promise.resolve()
+//   }
+// };

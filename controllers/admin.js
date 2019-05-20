@@ -67,16 +67,37 @@ exports.deleteTournament = (req, res, next) => {
 
 // Obtener datos de torneo que soy admin
 
-exports.getTournament = (req,res,next) => {
-    tournament.findOne({
+exports.getTournament = async (req,res,next) => {
+      tournament.findOne({
         where: {
             id: req.params.tournamentId,
             adminId: req.userId
         }, include:[couple]
     })
-    .then(tournament => {
+    .then(async tournament => {
+
+      nombresDelTorneo = []
         if(tournament && tournament.adminId === req.userId){
-        res.status(200).json({msg: 'Correcto', tournament: tournament});}
+          
+ //Obtener los nombres y los correos de los jugadores que forman las parejas
+         
+            for(c of tournament.couples){
+
+                  user1 = await user.findOne({where:{
+                    id: c.user1Id
+                  }});
+                  user2 = await user.findOne({where:{
+                    id: c.user2Id
+                  }});
+                  nombresDelTorneo.push(c.id,user1.name + " " + user1.apellidos);
+                  nombresDelTorneo.push(c.id, user2.name + " " + user2.apellidos);
+
+            }
+
+
+           
+
+        res.status(200).json({msg: 'Correcto', tournament: tournament, nombres:nombresDelTorneo});}
         else {
             res.status(400).json({error: 'El torneo no existe o no es usted admin'})
         }
@@ -89,7 +110,7 @@ exports.getTournament = (req,res,next) => {
 
 // Añadir pareja a torneo que soy admin
 
-exports.putAddCouple = (req, res, next) => {
+exports.addCouple = (req, res, next) => {
    
     //Buscar usuario1
     user.findOne({
@@ -116,17 +137,13 @@ exports.putAddCouple = (req, res, next) => {
     
             if(!user) {
                 return res.status(404).json({error: "El correo del jugador 2 no está registrado"});
-    
             };
     
             req.user2Id = user.id;
 
             if(req.user1Id == req.user2Id){
-              return res.status(403).json({error: "Los 2 miembros de la pareja son el mismo usuario"});
-              
+              return res.status(403).json({error: "Los 2 miembros de la pareja son el mismo usuario"});        
             }
-
-
 
         }).then(() => {
 
@@ -153,6 +170,8 @@ exports.putAddCouple = (req, res, next) => {
     })
     
 };
+
+
 
 // Eliminar pareja de torneo del que soy admin
 
@@ -229,12 +248,15 @@ exports.startTournament = async (req, res, next) => {
        let order = req.body.order;
        //console.log(order);
        let couples = [];
-       if(order != null){
+       if(order){
            
            for(id of order)
            {
                let pareja = null;
                pareja = await couple.findById(id);
+               if(pareja == null){
+                 return res.status(400).json({error:"El id" + id + " no es correcto"});
+               }
                await couples.push(pareja);
             
            }
@@ -468,10 +490,15 @@ exports.editResult = async (req, res, next) => {
     couple1.partidosPerdidos = couple1.partidosPerdidos + 1;
     couple2.partidosGanados = couple2.partidosGanados + 1;
 
-    couple1.puntos = couple1.puntos + tourney.puntosPG;
-    couple2.puntos = couple2.puntos + tourney.puntosPP;
+    couple1.puntos = couple1.puntos + tourney.puntosPP;
+    couple2.puntos = couple2.puntos + tourney.puntosPG;
 
   }
+
+  couple1.juegosGanados = couple1.juegosGanados + juegospareja1;
+  couple2.juegosGanados = couple2.juegosGanados + juegospareja2;
+  couple1.juegosPerdidos = couple1.juegosPerdidos + juegospareja2;
+  couple2.juegosPerdidos = couple2.juegosPerdidos + juegospareja1;
 
   //Actualizar diferencia de sets y diferencia de juegos
   couple1.diferenciaSets = couple1.diferenciaSets + (partido.set1Couple1 + partido.set2Couple1 + partido.set3Couple1 - (partido.set1Couple2 + partido.set2Couple2 + partido.set3Couple2));

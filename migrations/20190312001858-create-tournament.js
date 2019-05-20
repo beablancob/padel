@@ -13,24 +13,16 @@ module.exports = {
       name: {
         type: Sequelize.STRING
       },
+      adminId: {
+        type: Sequelize.INTEGER,
+        allowNull:false
+      },
       numberCouples: {
         type: Sequelize.INTEGER
       },
       parejasPorGrupo: {
         type: Sequelize.INTEGER,
         defaultValue:2
-      },
-      createdAt: {
-        allowNull: false,
-        type: Sequelize.DATE
-      },
-      updatedAt: {
-        allowNull: false,
-        type: Sequelize.DATE
-      },
-      adminId: {
-        type: Sequelize.INTEGER,
-        allowNull:false
       },
       puntosPG: {type: Sequelize.INTEGER,
         allowNull: false,
@@ -46,7 +38,6 @@ module.exports = {
       idaYvuelta: {
         type: Sequelize.BOOLEAN,
         defaultValue:false
-    
       },
       publico: {
         type: Sequelize.BOOLEAN,
@@ -64,6 +55,14 @@ module.exports = {
         type:Sequelize.UUID,
         defaultValue:uuidv4(),
         unique:true
+      },
+      createdAt: {
+        allowNull: false,
+        type: Sequelize.DATE
+      },
+      updatedAt: {
+        allowNull: false,
+        type: Sequelize.DATE
       }
     });
   },

@@ -14,13 +14,14 @@ module.exports = {
     */
 
    return queryInterface.bulkInsert('couples', 
-   [{
+    [
+    {
      user1Id:1,
      user2Id:2,
      tournamentId: 1,
      createdAt: new Date(),
-     updatedAt: new Date(),
-     grupoActual:0
+     updatedAt: new Date()
+     
 
     },
     {
@@ -28,8 +29,8 @@ module.exports = {
       user2Id:4,
       tournamentId: 1,
       createdAt: new Date(),
-      updatedAt: new Date(),
-      grupoActual:0
+      updatedAt: new Date()
+     
  
      },
      {
@@ -37,8 +38,7 @@ module.exports = {
       user2Id:6,
       tournamentId: 1,
       createdAt: new Date(),
-      updatedAt: new Date(),
-      grupoActual:0
+      updatedAt: new Date()
  
      },
      {
@@ -46,8 +46,7 @@ module.exports = {
       user2Id:8,
       tournamentId: 1,
       createdAt: new Date(),
-      updatedAt: new Date(),
-      grupoActual:1
+      updatedAt: new Date()
  
      },
      {
@@ -55,8 +54,7 @@ module.exports = {
       user2Id:10,
       tournamentId: 1,
       createdAt: new Date(),
-      updatedAt: new Date(),
-      grupoActual:1
+      updatedAt: new Date()
  
      },
      {
@@ -64,8 +62,7 @@ module.exports = {
       user2Id:12,
       tournamentId: 1,
       createdAt: new Date(),
-      updatedAt: new Date(),
-      grupoActual:1
+      updatedAt: new Date()
  
      }
 
@@ -83,3 +80,15 @@ module.exports = {
     */
   }
 };
+
+// 'use strict';
+
+// module.exports = {
+//   up: function(queryInterface, Sequelize) {
+//     return Promise.resolve()
+//   },
+
+//   down: function(queryInterface) {
+//     return Promise.resolve()
+//   }
+// };
