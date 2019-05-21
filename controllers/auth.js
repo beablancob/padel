@@ -4,6 +4,18 @@ const {user, tournament, couple, partido} = require('../models/index');
 const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
 
+
+const sendgridTransport = require('nodemailer-sendgrid-transport');
+const nodemailer = require('nodemailer');
+
+const transporter = nodemailer.createTransport(sendgridTransport({
+
+  auth: {
+    
+    api_key:'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'
+  }
+}));
+
 //Comprobamos que no este duplicado el correo
 
 exports.preSignUp = (req, res, next) => {
@@ -61,6 +73,15 @@ exports.postSignup = (req, res, next) => {
 
     })
     .then(user => {
+
+        //Enviar correo cuando se registra
+        // transporter.sendMail({
+        //     to:user.email,
+        //     from: 'tfg@padel.com',
+        //     subject:'TFG PÁDEL',
+        //     html:'<h1> Te acabas de registrar en TFG de Pádel</h1>'
+        // })
+
         return res.status(201).json({msg: "Registrado con éxito", user: user});
     })
     .catch(err => {

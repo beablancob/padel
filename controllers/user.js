@@ -5,6 +5,17 @@ const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
 const userController = require('../controllers/user');
 
+const sendgridTransport = require('nodemailer-sendgrid-transport');
+const nodemailer = require('nodemailer');
+
+const transporter = nodemailer.createTransport(sendgridTransport({
+
+  auth: {
+    
+    api_key:'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'
+  }
+}));
+
 
 
 //Obtener torneos 
@@ -179,6 +190,38 @@ exports.editResultPartido = async(req, res, next) => {
   //Una vez añadido el resultado lo guardamos en la bbdd
   await match.save();
 
+  //Enviar correo para a la otra pareja para confirmar el resultado
+
+  //Obtener la pareja a la que enviar el correo
+//   if(match.couple1Id == req.couple.id){
+//       confirmCoupleId = match.couple2Id;
+//   }else{
+//       confirmCoupleId = match.couple1Id;
+//   }
+
+//   confirmCouple = await couple.findOne({where:{
+//       id: confirmCoupleId
+//   }})
+
+//   //Buscar el correo de los 2 jugadores
+//   user1 = await user.findOne({where:{
+//       id: confirmCouple.user1Id
+//   }});
+
+//   user2 = await user.findOne({where:{
+//     id: confirmCouple.user2Id
+// }});
+
+// emails = [user1.email,user2.email];
+
+//   transporter.sendMail({
+//     to:emails,
+//     from: 'tfg@padel.com',
+//     subject:'TFG PÁDEL',
+//     html:'<h1> Puedes confirmar el partido</h1>'
+// })
+
+  
  //Devolvemos el partido con los datos actualizados
     return res.status(200).json({edited:"true",partido: match})
 
@@ -303,6 +346,31 @@ exports.confirmResultPartido = async(req, res, next) => {
  //Guardamos en la bbdd
  await couple1.save();
  await couple2.save();
+
+
+//Enviar correo una vez confirmado a la pareja que editó
+
+// editedCouple = await couple.findOne({where:{
+//     id: match.coupleEditedId
+// }})
+
+// //Buscar el correo de los 2 jugadores
+// user1 = await user.findOne({where:{
+//     id: editedCouple.user1Id
+// }});
+
+// user2 = await user.findOne({where:{
+//   id: editedCouple.user2Id
+// }});
+
+// emails = [user1.email,user2.email];
+
+// transporter.sendMail({
+//   to:emails,
+//   from: 'tfg@padel.com',
+//   subject:'TFG PÁDEL',
+//   html:'<h1> El resultado fue confirmado</h1>'
+// })
 
         
 
@@ -471,7 +539,6 @@ exports.getRondaInfo = async(req, res, next) => {
       }
 
         
-
         partidos = await tourney.getPartidos({where:
         {
             numeroRonda: tourney.rondaActual

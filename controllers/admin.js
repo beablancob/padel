@@ -5,6 +5,18 @@ const {user, tournament, couple, partido, couplePreviousRound} = require('../mod
 const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
 
+const sendgridTransport = require('nodemailer-sendgrid-transport');
+const nodemailer = require('nodemailer');
+
+const transporter = nodemailer.createTransport(sendgridTransport({
+
+  auth: {
+    
+    api_key:'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'
+  }
+}));
+
+
 //Crear torneo
 exports.postTournament = (req,res,next) => {
     const name = req.body.name || ("Torneo de " + req.user.name);
@@ -522,6 +534,37 @@ exports.editResult = async (req, res, next) => {
   partido.jugado = true;
   //Una vez añadido el resultado lo guardamos en la bbdd
   await partido.save();
+
+
+  //Enviar correo de que el resultado ha sido subido por el administrador
+
+  //Obtener los emails de los 4 jugadores del partido
+  // user1 = await user.findOne({where: {
+  //   id: couple1.user1Id
+  //   }});
+
+  //   user2 = await user.findOne({where: {
+  //     id: couple1.user2Id
+  //     }});
+
+  //     user3 = await user.findOne({where: {
+  //       id: couple2.user1Id
+  //       }})
+
+  //       user4 = await user.findOne({where: {
+  //         id: couple2.user2Id
+  //         }})
+
+  //         var emails = [user1.email,user2.email,user3.email,user4.email];
+
+
+  //   transporter.sendMail({
+  //     to:emails,
+  //   from: 'tfg@padel.com',
+  //   subject:'TFG PÁDEL',
+  //   html:'<h1> El administrador actualizó el resultado del partido</h1>'
+  // })
+
 
  //Devolvemos el partido con los datos actualizados
   return res.status(200).json({partido: partido})
