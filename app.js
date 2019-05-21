@@ -99,17 +99,14 @@ app.get('/admin/tournaments', adminRouter);
 //Obtener una ronda en concreto
 app.get('/tournaments/:tournamentId/ronda/:numeroRonda', userRouter);
 
-//Obtener torneos en los que juego
-app.get('/users/:userId/tournaments', userRouter);
+//Obtener torneos en los que juego, query publicos
+app.get('/tournaments', userRouter);
 
 //Editar datos de usuario
 app.put('/users/:userId', userRouter);
 
 //Eliminar cuenta
 app.delete('/users/:userId', userRouter);
-
-//Obtener torneos publicos 
-app.get('/tournaments/publicos', userRouter);
 
 //Obtener datos de un torneo
 app.get('/tournaments/:tournamentId', userRouter);

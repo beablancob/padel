@@ -24,7 +24,7 @@ module.exports = {
      puntosPG:3,
      puntosPP:1,
      rondaActual:0,
-     publico:false,
+     publico:true,
      idaYvuelta:false,
      numeroRondas:8,
      parejasSuben:1,

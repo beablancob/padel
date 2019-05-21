@@ -3,10 +3,14 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
+const userController = require('../controllers/user');
 
 
-//Devolver torneos publicos no empezados
-exports.getPublicTournaments = (req, res, next) => {
+
+//Obtener torneos 
+ exports.getTournaments = async (req, res, next) => {
+
+    if(req.query.publico == "true"){
 
     tournament.findAll({
         where: {
@@ -26,19 +30,9 @@ exports.getPublicTournaments = (req, res, next) => {
 
     })
 
+    }else{
 
-};
-
-//Obtener torneos en los que estoy inscrito o estoy jugando
- exports.getMyTournaments = async (req, res, next) => {
-
-    if(!req.params.userId){
-        return res.status(400).json({error:"No envió el id de usuario"})
-    }
-
-    if(req.params.userId != req.userId){
-        return res.status(403).json({error:"El id de usuario no es el suyo"})
-    }
+    
 
 //     //Cojo parejas en las que estoy
 const parejasQueEstoy = await couple.findAll({where:{
@@ -68,6 +62,7 @@ for(p of parejasQueEstoy){
 });
 
 return res.status(200).json({tournaments: torneosQueEstoy, couples: parejasQueEstoy});
+    }
     };
 
 //Obtener datos torneo

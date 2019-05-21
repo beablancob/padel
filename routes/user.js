@@ -9,17 +9,13 @@ const userController = require('../controllers/user');
 //Obtener una ronda de un torneo que juego o es publico
 router.get('/tournaments/:tournamentId/ronda/:numeroRonda', authController.verifyToken, authController.isPlayerTournament, userController.getRondaInfo);
 
-//Obtener los torneos que estoy inscrito
-router.get('/users/:userId/tournaments', authController.verifyToken, userController.getMyTournaments);
+
 
 //Editar info usuario
 router.put('/users/:userId', authController.verifyToken, userController.editInfo);
 
 //Eliminar cuenta propia
 router.delete('/users/:userId', authController.verifyToken, userController.deleteUser);
-
-//Obtener torneos publicos 
-router.get('/tournaments/publicos', authController.verifyToken, userController.getPublicTournaments);
 
 //Obtener datos de un torneo
 router.get('/tournaments/:tournamentId', authController.verifyToken, authController.isPlayerTournament, userController.getTournament);
@@ -32,6 +28,9 @@ router.put('/partidos/:partidoId/confirmResult', authController.verifyToken, aut
 
 //Registrarse en un torneo
 router.post('/tournaments/:registerLink/couples', authController.verifyToken, userController.tournamentRegister);
+
+//Obtener los torneos ?publico=true para obtener públicos
+router.get('/tournaments', authController.verifyToken, userController.getTournaments);
 
 //Eliminar pareja a la que pertenezco
 router.delete('/couples/:coupleId', authController.verifyToken, userController.deleteCouple);
