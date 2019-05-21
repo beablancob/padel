@@ -61,6 +61,9 @@ app.get('/admin/tournaments/:tournamentId/previousRounds', adminRouter);
 //Avanzar ronda
 app.post('/admin/tournaments/:tournamentId/nextRound', adminRouter);
 
+//Obtener las parejas de un torneo
+app.get('/admin/tournaments/:tournamentId/couples', adminRouter);
+
 //Editar resultado de un partido
 app.put('/admin/tournaments/:tournamentId/partidos/:partidoId', adminRouter);
 

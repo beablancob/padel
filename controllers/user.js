@@ -87,7 +87,7 @@ for(c of tourney.couples){
       id: c.user2Id
     }});
     nombresDelTorneo.push(c.id,user1.name + " " + user1.apellidos);
-    nombresDelTorneo.push(c.id, user2.name + " " + user2.apellidos);
+    nombresDelTorneo.push( user2.name + " " + user2.apellidos);
 
 }
 
@@ -466,7 +466,7 @@ exports.getRondaInfo = async(req, res, next) => {
               id: p.user2Id
             }});
             nombresDelTorneo.push(p.id,user1.name + " " + user1.apellidos);
-            nombresDelTorneo.push(p.id, user2.name + " " + user2.apellidos);
+            nombresDelTorneo.push( user2.name + " " + user2.apellidos);
 
       }
 

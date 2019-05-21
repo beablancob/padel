@@ -10,8 +10,11 @@ router.put('/admin/tournaments/:tournamentId/partidos/:partidoId', authControlle
 //Obtener rondas anteriores
 router.get('/admin/tournaments/:tournamentId/previousRounds', authController.verifyToken, authController.isAdmin, adminController.previousRounds);
 
+//Obtener parejas torneo
+router.get('/admin/tournaments/:tournamentId/couples', authController.verifyToken, authController.isAdmin, adminController.getTournamentCouples);
+
 //Iniciar primera ronda que soy admin
-router.put('/admin/tournaments/:tournamentId/start',authController.verifyToken, authController.isAdmin, adminController.startTournament)
+router.put('/admin/tournaments/:tournamentId/start',authController.verifyToken, authController.isAdmin, adminController.startTournament);
 
 //Avanzar ronda
 router.post('/admin/tournaments/:tournamentId/nextRound', authController.verifyToken, authController.isAdmin, adminController.nextRound);

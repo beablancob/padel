@@ -90,7 +90,7 @@ exports.getTournament = async (req,res,next) => {
                     id: c.user2Id
                   }});
                   nombresDelTorneo.push(c.id,user1.name + " " + user1.apellidos);
-                  nombresDelTorneo.push(c.id, user2.name + " " + user2.apellidos);
+                  nombresDelTorneo.push( user2.name + " " + user2.apellidos);
 
             }
 
@@ -1018,4 +1018,31 @@ exports.editCouple = async(req, res) => {
 
 
 
+exports.getTournamentCouples = async(req, res) => {
 
+  let couples = await req.tourney.getCouples();
+  //console.log(couples);
+  if(couples.length  == 0){
+    return res.status(200).json({msg: "No hay ninguna pareja inscrita en el torneo"});
+  }
+
+  nombresDelTorneo = [];
+   //Obtener los nombres y los correos de los jugadores que forman las parejas
+         
+   for(c of couples){
+
+    user1 = await user.findOne({where:{
+      id: c.user1Id
+    }});
+
+    user2 = await user.findOne({where:{
+      id: c.user2Id
+    }});
+    nombresDelTorneo.push(c.id,user1.name + " " + user1.apellidos);
+    nombresDelTorneo.push( user2.name + " " + user2.apellidos);
+
+}
+  
+  return res.status(200).json({couples: couples,nombresDelTorneo: nombresDelTorneo });
+
+};

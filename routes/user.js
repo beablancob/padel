@@ -9,8 +9,6 @@ const userController = require('../controllers/user');
 //Obtener una ronda de un torneo que juego o es publico
 router.get('/tournaments/:tournamentId/ronda/:numeroRonda', authController.verifyToken, authController.isPlayerTournament, userController.getRondaInfo);
 
-
-
 //Editar info usuario
 router.put('/users/:userId', authController.verifyToken, userController.editInfo);
 
