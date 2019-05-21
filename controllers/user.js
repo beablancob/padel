@@ -363,12 +363,12 @@ return res.status(200).json({edited: true,user: u, newToken: newToken });
 
 exports.tournamentRegister = async(req, res, next) => {
     
-    if(!req.params.registerLink){
+    if(!req.params.registerCode){
         return res.status(400).json({error: "No envió un link de torneo"})
     }
-    //Buscamos el torneo con el parametro registerLink
+    //Buscamos el torneo con el parametro registerCode
     tourney = await tournament.findOne({where:{
-    registerLink: req.params.registerLink }});
+        registerCode: req.params.registerCode }});
 
     if(!tourney){
         return res.status(400).json({error: "No existe ningun torneo con ese id"})

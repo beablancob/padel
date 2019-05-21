@@ -51,7 +51,7 @@ module.exports = {
         type:Sequelize.INTEGER,
         defaultValue:0
       },
-      registerLink: {
+      registerCode: {
         type:Sequelize.UUID,
         defaultValue:uuidv4(),
         unique:true

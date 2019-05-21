@@ -27,7 +27,7 @@ router.put('/partidos/:partidoId', authController.verifyToken, authController.is
 router.put('/partidos/:partidoId/confirmResult', authController.verifyToken, authController.isPlayerPartido, userController.confirmResultPartido);
 
 //Registrarse en un torneo
-router.post('/tournaments/:registerLink/couples', authController.verifyToken, userController.tournamentRegister);
+router.post('/tournaments/:registerCode/couples', authController.verifyToken, userController.tournamentRegister);
 
 //Obtener los torneos ?publico=true para obtener públicos
 router.get('/tournaments', authController.verifyToken, userController.getTournaments);

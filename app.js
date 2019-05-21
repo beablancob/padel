@@ -121,7 +121,7 @@ app.put('/partidos/:partidoId', userRouter);
 app.put('/partidos/:partidoId/confirmResult', userRouter);
 
 //Registrarse en un torneo que aun no ha comenzado con enlace
-app.post('/tournaments/:registerLink/couples', userRouter);
+app.post('/tournaments/:registerCode/couples', userRouter);
 
 
 

@@ -48,7 +48,7 @@ module.exports = (sequelize, DataTypes) => {
     type:DataTypes.INTEGER,
     defaultValue:0
   },
-  registerLink: {
+  registerCode: {
     type:DataTypes.UUIDV4,
     defaultValue: uuidv4(),
     allowNull:false

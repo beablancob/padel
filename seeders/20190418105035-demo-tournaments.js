@@ -28,7 +28,7 @@ module.exports = {
      idaYvuelta:false,
      numeroRondas:8,
      parejasSuben:1,
-     registerLink:uuidv4(),
+     registerCode:uuidv4(),
      createdAt: new Date(),
      updatedAt: new Date()
 
