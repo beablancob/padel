@@ -444,29 +444,42 @@ exports.editResult = async (req, res, next) => {
 
   if( partido.set1Couple1 > partido.set1Couple2){
     couple1.setsGanados = couple1.setsGanados + 1;
+    couple1.diferenciaSets = couple1.diferenciaSets + 1;
     couple2.setsPerdidos = couple2.setsPerdidos + 1;
+    couple2.diferenciaSets = couple2.diferenciaSets - 1;
     
   } else{
    couple1.setsPerdidos = couple1.setsPerdidos + 1;
    couple2.setsGanados = couple2.setsGanados + 1;
+   couple1.diferenciaSets = couple1.diferenciaSets - 1;
+   couple2.diferenciaSets = couple2.diferenciaSets + 1;
   }
   //Set 2
   if( partido.set2Couple1 > partido.set2Couple2){
     couple1.setsGanados = couple1.setsGanados + 1;
+    couple1.diferenciaSets = couple1.diferenciaSets + 1;
     couple2.setsPerdidos = couple2.setsPerdidos + 1;
+    couple2.diferenciaSets = couple2.diferenciaSets - 1;
    
  } else{
-    couple1.setsPerdidos = couple1.setsPerdidos + 1;
-   couple2.setsGanados = couple2.setsGanados + 1;
+  couple1.setsPerdidos = couple1.setsPerdidos + 1;
+  couple2.setsGanados = couple2.setsGanados + 1;
+  couple1.diferenciaSets = couple1.diferenciaSets - 1;
+  couple2.diferenciaSets = couple2.diferenciaSets + 1;
  }
  //Set 3
  if( partido.set3Couple1 > partido.set3Couple2){
-    couple1.setsGanados = couple1.setsGanados + 1;
-    couple2.setsPerdidos = couple2.setsPerdidos + 1;
+  couple1.setsGanados = couple1.setsGanados + 1;
+  couple1.diferenciaSets = couple1.diferenciaSets + 1;
+  couple2.setsPerdidos = couple2.setsPerdidos + 1;
+  couple2.diferenciaSets = couple2.diferenciaSets - 1;
    
- } else{
-    couple1.setsPerdidos = couple1.setsPerdidos + 1;
-   couple2.setsGanados = couple2.setsGanados + 1;
+    //Puede ser que solo hayan sido 2 sets
+ } else if (partido.set3Couple1 < partido.set3Couple2){
+  couple1.setsPerdidos = couple1.setsPerdidos + 1;
+  couple2.setsGanados = couple2.setsGanados + 1;
+  couple1.diferenciaSets = couple1.diferenciaSets - 1;
+  couple2.diferenciaSets = couple2.diferenciaSets + 1;
  }
 
   
@@ -483,7 +496,7 @@ exports.editResult = async (req, res, next) => {
     couple2.puntos = couple2.puntos + tourney.puntosPP;
 
     
-
+    //Actualizar el partido
   }else {
     partido.ganador = partido.couple2Id;
 
@@ -495,14 +508,9 @@ exports.editResult = async (req, res, next) => {
 
   }
 
-  couple1.juegosGanados = couple1.juegosGanados + juegospareja1;
-  couple2.juegosGanados = couple2.juegosGanados + juegospareja2;
-  couple1.juegosPerdidos = couple1.juegosPerdidos + juegospareja2;
-  couple2.juegosPerdidos = couple2.juegosPerdidos + juegospareja1;
+  
 
-  //Actualizar diferencia de sets y diferencia de juegos
-  couple1.diferenciaSets = couple1.diferenciaSets + (partido.set1Couple1 + partido.set2Couple1 + partido.set3Couple1 - (partido.set1Couple2 + partido.set2Couple2 + partido.set3Couple2));
-  couple2.diferenciaSets = couple2.diferenciaSets + (partido.set1Couple2 + partido.set2Couple2 + partido.set3Couple2 - (partido.set1Couple1 + partido.set2Couple1 + partido.set3Couple1));
+  //Actualizar diferencia de juegos
 
   couple1.diferenciaJuegos = couple1.diferenciaJuegos + (juegospareja1 - juegospareja2);
   couple2.diferenciaJuegos = couple2.diferenciaJuegos + (juegospareja2 - juegospareja1);
@@ -777,7 +785,7 @@ exports.nextRound = async (req,res,next) => {
       console.log(p.id);
     }
 
-    //Cogemos el metodo de iniciar el torneo (/start), la ultima parte, sino hay order
+    //Cogemos el metodo de iniciar el torneo (/start), la ultima parte, en la que no hay  orden
     let couples = [];
     couples = parejasOrdenadasGrupos;
     //la j llevara el numero del grupo

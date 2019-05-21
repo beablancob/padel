@@ -233,29 +233,43 @@ exports.confirmResultPartido = async(req, res, next) => {
 
   if( match.set1Couple1 > match.set1Couple2){
     couple1.setsGanados = couple1.setsGanados + 1;
+    couple1.diferenciaSets = couple1.diferenciaSets + 1;
     couple2.setsPerdidos = couple2.setsPerdidos + 1;
+    couple2.diferenciaSets = couple2.diferenciaSets - 1;
+    
     
   } else{
-   couple1.setsPerdidos = couple1.setsPerdidos + 1;
-   couple2.setsGanados = couple2.setsGanados + 1;
+    couple1.setsPerdidos = couple1.setsPerdidos + 1;
+    couple2.setsGanados = couple2.setsGanados + 1;
+    couple1.diferenciaSets = couple1.diferenciaSets - 1;
+    couple2.diferenciaSets = couple2.diferenciaSets + 1;
   }
   //Set 2
   if( match.set2Couple1 > match.set2Couple2){
     couple1.setsGanados = couple1.setsGanados + 1;
+    couple1.diferenciaSets = couple1.diferenciaSets + 1;
     couple2.setsPerdidos = couple2.setsPerdidos + 1;
+    couple2.diferenciaSets = couple2.diferenciaSets - 1;
    
  } else{
     couple1.setsPerdidos = couple1.setsPerdidos + 1;
    couple2.setsGanados = couple2.setsGanados + 1;
+   couple1.diferenciaSets = couple1.diferenciaSets - 1;
+   couple2.diferenciaSets = couple2.diferenciaSets + 1;
  }
  //Set 3
  if( match.set3Couple1 > match.set3Couple2){
+     
     couple1.setsGanados = couple1.setsGanados + 1;
+    couple1.diferenciaSets = couple1.diferenciaSets + 1;
     couple2.setsPerdidos = couple2.setsPerdidos + 1;
+    couple2.diferenciaSets = couple2.diferenciaSets - 1;
    
- } else{
+ } else if (match.set3Couple1 < match.set3Couple2){
     couple1.setsPerdidos = couple1.setsPerdidos + 1;
    couple2.setsGanados = couple2.setsGanados + 1;
+   couple1.diferenciaSets = couple1.diferenciaSets - 1;
+   couple2.diferenciaSets = couple2.diferenciaSets + 1;
  }
 
 
@@ -286,9 +300,7 @@ exports.confirmResultPartido = async(req, res, next) => {
   couple2.juegosGanados = couple2.juegosGanados + juegospareja2;
   couple1.juegosPerdidos = couple1.juegosPerdidos + juegospareja2;
   couple2.juegosPerdidos = couple2.juegosPerdidos + juegospareja1;
-  //Actualizar diferencia de sets y diferencia de juegos
-  couple1.diferenciaSets = couple1.diferenciaSets + (match.set1Couple1 + match.set2Couple1 + match.set3Couple1 - (match.set1Couple2 + match.set2Couple2 + match.set3Couple2));
-  couple2.diferenciaSets = couple2.diferenciaSets + (match.set1Couple2 + match.set2Couple2 + match.set3Couple2 - (match.set1Couple1 + match.set2Couple1 + match.set3Couple1));
+  //Actualizar diferencia y diferencia de juegos
 
   couple1.diferenciaJuegos = couple1.diferenciaJuegos + (juegospareja1 - juegospareja2);
   couple2.diferenciaJuegos = couple2.diferenciaJuegos + (juegospareja2 - juegospareja1);
