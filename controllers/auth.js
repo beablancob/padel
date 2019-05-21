@@ -34,11 +34,11 @@ exports.preSignUp = (req, res, next) => {
 exports.postSignup = (req, res, next) => {
 
     if(!req.body.email){
-        return res.status(500).json({error: "Falta el email"});
+        return res.status(400).json({error: "Falta el email"});
     }
 
     if(!req.body.password1 || !req.body.password2){
-        return res.status(500).json({error: "Falta la contraseña"});
+        return res.status(400).json({error: "Falta la contraseña"});
     }
 
     if(req.body.password1 != req.body.password2){
@@ -46,11 +46,11 @@ exports.postSignup = (req, res, next) => {
     }
 
     if(!req.body.name){
-        return res.status(500).json({error: "Falta el nombre"});
+        return res.status(400).json({error: "Falta el nombre"});
     }
 
     if(!req.body.apellidos){
-        return res.status(500).json({error: "Faltan los apellidos"});
+        return res.status(400).json({error: "Faltan los apellidos"});
     }
 
     user.create({
