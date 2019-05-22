@@ -99,6 +99,8 @@ app.get('/admin/tournaments', adminRouter);
 
 //USER
 
+app.post('/tournaments/:tournamentId/mail', userRouter);
+
 //Obtener una ronda en concreto
 app.get('/tournaments/:tournamentId/ronda/:numeroRonda', userRouter);
 

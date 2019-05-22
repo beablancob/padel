@@ -608,3 +608,138 @@ exports.deleteUser = async(req,res) => {
 
  };
 
+
+ exports.sendMail = async(req, res) => {
+
+    //Enviar correo una vez confirmado a la pareja que editó
+    if (!req.body.html){
+        return res.status(400).json({error:"No ha enviado el body del correo"});
+    }
+
+
+    if(!req.query.to){
+        return res.status(400).json({error:"No ha indicado el destinatario del mensaje"});
+    }
+
+    //Solo administrador
+
+    if(req.query.to == "admin"){
+
+        //Obtener email admin
+        admin = await user.findOne({where:{
+            id: req.tourney.adminId
+        }})
+
+        transporter.sendMail({
+            to:admin.email,
+            from: req.user.email,
+            subject:'TFG PÁDEL',
+            html: req.body.html
+        })
+
+        return res.status(200).json({msg:"Email enviado correctamente"});
+
+    }
+
+    //Todas las parejas del torneo
+
+    if(req.query.to == "all"){
+        
+        let emails = [];
+        //Obtener el correo de todos los usuarios
+        parejasTorneo = await req.tourney.getCouples();
+
+        for(p of parejasTorneo){
+
+            user1 = await user.findOne({where:
+            {
+                id: p.user1Id
+            }})
+
+            user2 = await user.findOne({where:{
+                id:p.user2Id
+            }})
+            
+            //Meter los emails en el array de emails
+            //No enviarlo a uno mismo
+            if(req.user.email != user1.email)
+            {
+                emails.push(user1.email);
+            }
+            
+            if(req.user.email != user2.email)
+            {
+            emails.push(user2.email);
+            }
+
+        }
+
+        transporter.sendMail({
+            to:emails,
+            from: req.user.email,
+            subject:'TFG PÁDEL',
+            html: req.body.html
+        })
+
+        return res.status(200).json({msg:"Emails enviados correctamente"});
+
+
+    }
+
+    if(req.query.to == "group"){
+
+        let emails = [];
+
+        
+
+        //Obtener el correo de todos los usuarios del grupo
+        parejasTorneo = await req.tourney.getCouples({where:{
+            grupoActual: req.parejaUsuario.grupoActual
+        }});
+
+        for(p of parejasTorneo){
+
+            user1 = await user.findOne({where:
+            {
+                id: p.user1Id
+            }})
+
+            user2 = await user.findOne({where:{
+                id:p.user2Id
+            }})
+            
+            //Meter los emails en el array de emails
+            //No enviarlo a uno mismo
+            if(req.user.email != user1.email)
+            {
+                emails.push(user1.email);
+            }
+            
+            if(req.user.email != user2.email)
+            {
+            emails.push(user2.email);
+            }
+
+        }
+
+        transporter.sendMail({
+            to:emails,
+            from: req.user.email,
+            subject:'TFG PÁDEL',
+            html: req.body.html
+        })
+
+        return res.status(200).json({msg:"Emails enviados correctamente"});
+
+
+    }
+
+    return res.status(400).json({error: "El parámetro to no es correcto"});
+
+
+
+
+
+
+ }
+

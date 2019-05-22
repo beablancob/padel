@@ -6,6 +6,10 @@ const userController = require('../controllers/user');
 
 
 
+
+//Editar info usuario
+router.post('/tournaments/:tournamentId/mail', authController.verifyToken, authController.isPlayerTournament, userController.sendMail);
+
 //Obtener una ronda de un torneo que juego o es publico
 router.get('/tournaments/:tournamentId/ronda/:numeroRonda', authController.verifyToken, authController.isPlayerTournament, userController.getRondaInfo);
 

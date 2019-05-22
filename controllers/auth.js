@@ -217,6 +217,7 @@ exports.isPlayerTournament = async (req, res, next) => {
 
     if (pareja != null && pareja.tournamentId == req.params.tournamentId){
         req.tourney = tourney;
+        req.parejaUsuario = pareja;
         return next();
     }
 
