@@ -9,7 +9,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull:false
     },
-    numberCouples: {type: DataTypes.INTEGER,
+    numeroParejas: {type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 1
     }

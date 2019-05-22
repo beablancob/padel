@@ -19,7 +19,7 @@ module.exports = {
       name: {
         type: Sequelize.STRING
       },
-      apellidos: {
+      lastname: {
         type: Sequelize.STRING
       },
       createdAt: {

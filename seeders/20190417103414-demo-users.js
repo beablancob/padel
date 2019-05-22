@@ -16,20 +16,20 @@ module.exports = {
 
    return queryInterface.bulkInsert('users', 
    [
-    //  {
-    //  email: 'jorge@test.com',
-    //  password: bcrypt.hashSync('qwerty',10),
-    //  name:'Jorge',
-    //  apellidos:'García Pérez',
-    //  createdAt: new Date(),
-    //  updatedAt: new Date()
+     {
+     email: 'jorge@test.com',
+     password: bcrypt.hashSync('qwerty',10),
+     name:'Jorge',
+     lastname:'García Pérez',
+     createdAt: new Date(),
+     updatedAt: new Date()
 
-    // },
+    },
     {
       email: 'juan@test.com',
       password: bcrypt.hashSync('password',10),
       name:'Juan',
-      apellidos: 'Ortiz Gómez',
+      lastname: 'Ortiz Gómez',
       createdAt: new Date(),
       updatedAt: new Date()
  
@@ -38,7 +38,7 @@ module.exports = {
       email: 'pablo@test.com',
       password: bcrypt.hashSync('password',10),
       name:'Pablo',
-      apellidos: 'Romero Sánchez',
+      lastname: 'Romero Sánchez',
       createdAt: new Date(),
       updatedAt: new Date()
  
@@ -47,7 +47,7 @@ module.exports = {
       email: 'santiago@test.com',
       password: bcrypt.hashSync('password',10),
       name:'Santiago',
-      apellidos:'Lara Gómez',
+      lastname:'Lara Gómez',
       createdAt: new Date(),
       updatedAt: new Date()
  
@@ -56,7 +56,7 @@ module.exports = {
       email: 'camilo@test.com',
       password: bcrypt.hashSync('password',10),
       name:'Camilo',
-      apellidos:'Valdés Ortega',
+      lastname:'Valdés Ortega',
       createdAt: new Date(),
       updatedAt: new Date()
  
@@ -65,7 +65,7 @@ module.exports = {
       email: 'mario@test.com',
       password: bcrypt.hashSync('password',10),
       name:'Mario',
-      apellidos:'Acosta Alonso',
+      lastname:'Acosta Alonso',
       createdAt: new Date(),
       updatedAt: new Date()
  
@@ -74,7 +74,7 @@ module.exports = {
       email: 'belen@test.com',
       password: bcrypt.hashSync('password',10),
       name:'Belén',
-      apellidos:'Casto Espejo',
+      lastname:'Casto Espejo',
       createdAt: new Date(),
       updatedAt: new Date()
  
@@ -83,7 +83,7 @@ module.exports = {
       email: 'marta@test.com',
       password: bcrypt.hashSync('password',10),
       name:'Marta',
-      apellidos:'Cuevas Muñoz',
+      lastname:'Cuevas Muñoz',
       createdAt: new Date(),
       updatedAt: new Date()
  
@@ -92,7 +92,7 @@ module.exports = {
       email: 'sara@test.com',
       password: bcrypt.hashSync('password',10),
       name:'Sara',
-      apellidos:'Crespo Collado',
+      lastname:'Crespo Collado',
       createdAt: new Date(),
       updatedAt: new Date()
  
@@ -101,7 +101,7 @@ module.exports = {
       email: 'alvaro@test.com',
       password: bcrypt.hashSync('password',10),
       name:'Álvaro',
-      apellidos:'Castañeda Turga',
+      lastname:'Castañeda Turga',
       createdAt: new Date(),
       updatedAt: new Date()
  
@@ -110,7 +110,7 @@ module.exports = {
       email: 'irene@test.com',
       password: bcrypt.hashSync('password',10),
       name:'Irene',
-      apellidos:'Fernández Quintana',
+      lastname:'Fernández Quintana',
       createdAt: new Date(),
       updatedAt: new Date()
  
@@ -120,7 +120,7 @@ module.exports = {
       email: 'francisco@test.com',
       password: bcrypt.hashSync('password',10),
       name:'Francisco',
-      apellidos:'Notario Ayuso',
+      lastname:'Notario Ayuso',
       createdAt: new Date(),
       updatedAt: new Date()
  

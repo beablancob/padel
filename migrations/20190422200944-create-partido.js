@@ -53,7 +53,7 @@ module.exports = {
         type: Sequelize.INTEGER,
         defaultValue: 0
       },
-      coupleEditedId: {
+      parejaEditedId: {
         type: Sequelize.INTEGER
       },
 

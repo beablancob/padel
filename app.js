@@ -70,7 +70,7 @@ app.put('/admin/tournaments/:tournamentId/partidos/:partidoId', adminRouter);
 // Eliminar pareja de un torneo
 app.delete('/admin/tournaments/:tournamentId/couples/:coupleId', adminRouter);
 
-// Eliminar pareja de un torneo
+// Editar pareja de un torneo
 app.put('/admin/tournaments/:tournamentId/couples/:coupleId', adminRouter);
 
 // Dar comienzo a un torneo

@@ -97,8 +97,8 @@ for(c of tourney.couples){
     user2 = await user.findOne({where:{
       id: c.user2Id
     }});
-    nombresDelTorneo.push(c.id,user1.name + " " + user1.apellidos);
-    nombresDelTorneo.push( user2.name + " " + user2.apellidos);
+    nombresDelTorneo.push(c.id,user1.name + " " + user1.lastname);
+    nombresDelTorneo.push( user2.name + " " + user2.lastname);
 
 }
 
@@ -181,8 +181,7 @@ exports.editResultPartido = async(req, res, next) => {
   }
 
     //Poner que pareja ha editado el partido
-    match.coupleEditedId = req.couple.id;
-    console.log(match.coupleEditedId);
+    match.parejaEditedId = req.couple.id;
 
 
   //No ponemos true en este metodo, si en confirmar
@@ -243,9 +242,9 @@ exports.confirmResultPartido = async(req, res, next) => {
     
     
     //Como pasamos antes el middleware de isPlayingPartido,
-    //solo comprobamos que no sea el mismo id que coupleEditedId
+    //solo comprobamos que no sea el mismo id que parejaEditedId
     console.log(req.couple.id);
-    if(req.couple.id != match.coupleEditedId && match.jugado != true){
+    if(req.couple.id != match.parejaEditedId && match.jugado != true){
         
         //Ponemos el partido como jugado
         match.jugado = true;
@@ -351,7 +350,7 @@ exports.confirmResultPartido = async(req, res, next) => {
 //Enviar correo una vez confirmado a la pareja que editó
 
 // editedCouple = await couple.findOne({where:{
-//     id: match.coupleEditedId
+//     id: match.parejaEditedId
 // }})
 
 // //Buscar el correo de los 2 jugadores
@@ -400,17 +399,17 @@ exports.editInfo = async(req, res, next) => {
     if(req.body.password1 && req.body.password2 && req.body.password1 != req.body.password2){
         return res.status(400).json({error:"Fallo en las contraseñas"})
     }
-
+    let password;
     //Si envia password encriptarlo con bcrypt
     if(req.body.password){
-    req.body.password = await bcrypt.hashSync(req.body.password,10);
+    password = await bcrypt.hashSync(req.body.password,10);
     }
 
 
-u.email = (req.body.email || u.email).trim().toLowerCase();
+u.email = req.body.email || u.email.trim().toLowerCase();
 u.name = req.body.name || u.name;
-u.apellidos = req.body.apellidos || u.apellidos;
-u.password = req.body.password || u.password;
+u.lastname = req.body.lastname || u.lastname;
+u.password = password || u.password;
 
 u.save();
 
@@ -533,8 +532,8 @@ exports.getRondaInfo = async(req, res, next) => {
             user2 = await user.findOne({where:{
               id: p.user2Id
             }});
-            nombresDelTorneo.push(p.id,user1.name + " " + user1.apellidos);
-            nombresDelTorneo.push( user2.name + " " + user2.apellidos);
+            nombresDelTorneo.push(p.id,user1.name + " " + user1.lastname);
+            nombresDelTorneo.push( user2.name + " " + user2.lastname);
 
       }
 
@@ -550,7 +549,7 @@ exports.getRondaInfo = async(req, res, next) => {
 
     //Si no es la ronda actual coger las parejas de previousCouples
     parejas = await tourney.getCouplePreviousRounds({where:{
-        round: req.params.numeroRonda
+        ronda: req.params.numeroRonda
 
          }, order: [
         ['grupo','ASC'],
@@ -562,7 +561,27 @@ exports.getRondaInfo = async(req, res, next) => {
     partidos = await tourney.getPartidos({where:{
         numeroRonda: req.params.numeroRonda
     }})
-    return res.status(200).json({parejas: parejas, partidos:partidos })
+
+
+    //Obtener los nombres y los correos de los jugadores que forman las parejas
+    nombresDelTorneo = [];
+    for(p of parejas){
+
+        c = await couple.findOne({where:{
+            id: p.coupleId
+        }})
+
+      user1 = await user.findOne({where:{
+        id: c.user1Id
+      }});
+      user2 = await user.findOne({where:{
+        id: c.user2Id
+      }});
+      nombresDelTorneo.push(c.id, user1.name + " " + user1.lastname);
+      nombresDelTorneo.push( user2.name + " " + user2.lastname);
+    }
+
+    return res.status(200).json({parejas: parejas, partidos:partidos, nombres: nombresDelTorneo })
 
     
 

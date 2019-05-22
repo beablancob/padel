@@ -17,7 +17,7 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull:false
       },
-      numberCouples: {
+      numeroParejas: {
         type: Sequelize.INTEGER
       },
       parejasPorGrupo: {

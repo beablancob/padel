@@ -61,13 +61,13 @@ exports.postSignup = (req, res, next) => {
         return res.status(400).json({error: "Falta el nombre"});
     }
 
-    if(!req.body.apellidos){
-        return res.status(400).json({error: "Faltan los apellidos"});
+    if(!req.body.lastname){
+        return res.status(400).json({error: "Faltan los lastname"});
     }
 
     user.create({
         name: req.body.name.trim() || "",
-        apellidos: req.body.apellidos,
+        lastname: req.body.lastname,
         email:req.body.email.toLowerCase(),
         password: bcrypt.hashSync(req.body.password1,10)
 

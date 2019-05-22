@@ -12,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
     },
     name: DataTypes.STRING,
-    apellidos: DataTypes.STRING,
+    lastname: DataTypes.STRING,
 
   }, {});
   user.associate = function(models) {

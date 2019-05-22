@@ -20,12 +20,12 @@ const transporter = nodemailer.createTransport(sendgridTransport({
 //Crear torneo
 exports.postTournament = (req,res,next) => {
     const name = req.body.name || ("Torneo de " + req.user.name);
-    const numberCouples = req.body.numberCouples;
+    const numeroParejas = req.body.numeroParejas;
     user.findById(req.userId)
     .then(user => {
         tournament.create({
             name: name,
-            numberCouples: numberCouples,
+            numeroParejas: numeroParejas,
             adminId: req.userId,
             parejasPorGrupo: req.body.parejasPorGrupo,
             publico:req.body.publico,
@@ -101,15 +101,15 @@ exports.getTournament = async (req,res,next) => {
                   user2 = await user.findOne({where:{
                     id: c.user2Id
                   }});
-                  nombresDelTorneo.push(c.id,user1.name + " " + user1.apellidos);
-                  nombresDelTorneo.push( user2.name + " " + user2.apellidos);
+                  nombresDelTorneo.push(c.id,user1.name + " " + user1.lastname);
+                  nombresDelTorneo.push( user2.name + " " + user2.lastname);
 
             }
 
 
            
 
-        res.status(200).json({msg: 'Correcto', tournament: tournament, nombres:nombresDelTorneo});}
+        res.status(200).json({tournament: tournament, nombres:nombresDelTorneo});}
         else {
             res.status(400).json({error: 'El torneo no existe o no es usted admin'})
         }
@@ -223,7 +223,7 @@ exports.editTournament = async (req, res, next) => {
     if(t.rondaActual == 0){
         t.update({
           name: req.body.name || t.name,
-          numberCouples: req.body.numberCouples || t.numberCouples,
+          numeroParejas: req.body.numeroParejas || t.numeroParejas,
           parejasPorGrupo: req.body.parejasPorGrupo || t.parejasPorGrupo,
           publico:req.body.publico || t.publico,
           puntosPG:req.body.puntosPG || t.puntosPG,
@@ -257,7 +257,7 @@ exports.startTournament = async (req, res, next) => {
        //console.log(tourney.rondaActual);
 
        // Si le pasamos el orden de los grupos ejecuta el if 
-       let order = req.body.order;
+       let order = req.body.orden;
        //console.log(order);
        let couples = [];
        if(order){
@@ -603,12 +603,12 @@ exports.nextRound = async (req,res,next) => {
         }
 
         //Si no esta partido.jugado = true no sumar o no hay ningun resultado provisional(sin confirmar)
-        if(p.jugado != true && p.coupleEditedId == null){
+        if(p.jugado != true && p.parejaEditedId == null){
             continue;
         }
 
         //Si no esta confirmado, confirmarlo y  actualizar valores de parejas
-        if(p.jugado != true && p.coupleEditedId != null){
+        if(p.jugado != true && p.parejaEditedId != null){
 
             match = p;
 
@@ -718,7 +718,7 @@ exports.nextRound = async (req,res,next) => {
        await couplePreviousRound.create({
            coupleId: pareja.id,
            tournamentId: tourney.id,
-           round: tourney.rondaActual,
+           ronda: tourney.rondaActual,
            partidosJugados: pareja.partidosJugados,
            partidosGanados: pareja.partidosGanados,
            partidosPerdidos: pareja.partidosPerdidos,
@@ -742,7 +742,8 @@ exports.nextRound = async (req,res,next) => {
     let gruposDeParejas = [];
 
     for (g of grupos){
-      const parejas = await tourney.getCouples({
+
+      let parejasss = await tourney.getCouples({
         where: {
           grupoActual: g
         },
@@ -759,8 +760,8 @@ exports.nextRound = async (req,res,next) => {
       gruposDeParejas[g] = [];
 
       //Meto las parejas de el array de modo que quede gruposDeParejas[g]=[ParejasGrupoG] ordenadas por puntos, diferencia de sets y juegos en caso de empates
-      for (p of parejas){
-      gruposDeParejas[g].push(p);
+      for (pare of parejasss){
+      gruposDeParejas[g].push(pare);
       console.log(p.id);
       }
 
@@ -975,7 +976,7 @@ exports.previousRounds = async (req,res,next) => {
   for(g of grupos){
    
     parejasGrupo = await tourney.getCouplePreviousRounds({where:
-      {round: nRonda,
+      {ronda: nRonda,
         grupo: g},
         order: [
           ['puntos', 'DESC'],
@@ -1081,11 +1082,11 @@ exports.getTournamentCouples = async(req, res) => {
     user2 = await user.findOne({where:{
       id: c.user2Id
     }});
-    nombresDelTorneo.push(c.id,user1.name + " " + user1.apellidos);
-    nombresDelTorneo.push( user2.name + " " + user2.apellidos);
+    nombresDelTorneo.push(c.id,user1.name + " " + user1.lastname);
+    nombresDelTorneo.push( user2.name + " " + user2.lastname);
 
 }
   
-  return res.status(200).json({couples: couples,nombresDelTorneo: nombresDelTorneo });
+  return res.status(200).json({couples: couples,nombres: nombresDelTorneo });
 
 };

@@ -1,7 +1,7 @@
 'use strict';
 module.exports = (sequelize, DataTypes) => {
   const couplePreviousRound = sequelize.define('couplePreviousRound', {
-    round: DataTypes.INTEGER,
+    ronda: DataTypes.INTEGER,
     coupleId: DataTypes.INTEGER,
     tournamentId: DataTypes.INTEGER,
     partidosJugados: DataTypes.INTEGER,

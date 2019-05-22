@@ -18,6 +18,7 @@ module.exports = {
     {
      user1Id:1,
      user2Id:2,
+     grupoActual:0,
      tournamentId: 1,
      createdAt: new Date(),
      updatedAt: new Date()
@@ -28,6 +29,7 @@ module.exports = {
       user1Id:3,
       user2Id:4,
       tournamentId: 1,
+      grupoActual:0,
       createdAt: new Date(),
       updatedAt: new Date()
      
@@ -36,6 +38,7 @@ module.exports = {
      {
       user1Id:5,
       user2Id:6,
+      grupoActual:0,
       tournamentId: 1,
       createdAt: new Date(),
       updatedAt: new Date()
@@ -45,6 +48,7 @@ module.exports = {
       user1Id:7,
       user2Id:8,
       tournamentId: 1,
+      grupoActual:1,
       createdAt: new Date(),
       updatedAt: new Date()
  
@@ -53,6 +57,7 @@ module.exports = {
       user1Id:9,
       user2Id:10,
       tournamentId: 1,
+      grupoActual:1,
       createdAt: new Date(),
       updatedAt: new Date()
  
@@ -61,6 +66,7 @@ module.exports = {
       user1Id:11,
       user2Id:12,
       tournamentId: 1,
+      grupoActual:1,
       createdAt: new Date(),
       updatedAt: new Date()
  
