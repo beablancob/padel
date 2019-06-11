@@ -43,8 +43,6 @@ app.use((req, res, next) => {
 
 
 
-
-
 //LOGIN
 
 app.post('/signin', authRouter);

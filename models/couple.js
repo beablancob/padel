@@ -62,6 +62,29 @@ module.exports = (sequelize, DataTypes) => {
   couple.associate = function(models) {
     // associations can be defined here
     couple.belongsTo(models.tournament, {foreignKey: 'tournamentId'});
+
+    //Asocio con los usuarios que forman la pareja
+    couple.belongsTo(models.user, {as:'user1',foreignKey:'user1Id'});
+    couple.belongsTo(models.user, {as:'user2',foreignKey:'user2Id'});
+
+    //Asocio con los partidos que juegan la parejas
+    couple.hasMany(models.partido, {as:'partidos1',foreignKey:'couple1Id'});
+    couple.hasMany(models.partido, {as:'partidos2',foreignKey:'couple2Id'});
+
+    //Asocio con los resultados de las rondas anteriores
+    couple.hasMany(models.couplePreviousRound, {foreignKey:'coupleId'});
+
   };
+
+// Método para obtener todos los partidos de una pareja
+  couple.prototype.getPartidos = async function (){
+    
+   let partidos1 = await this.getPartidos1();
+   let partidos2 = await this.getPartidos2();
+
+   return partidos1.concat(partidos2);
+
+  };
+
   return couple;
 };

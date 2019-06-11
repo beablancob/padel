@@ -57,7 +57,10 @@ module.exports = (sequelize, DataTypes) => {
   }, {});
   tournament.associate = function(models) {
     // associations can be defined here
+    //Asocio con el id del administrador del torneo
     tournament.belongsTo(models.user, {foreignKey: 'adminId'});
+
+    //Asocio las parejas y partidos con el id del torneo
     tournament.hasMany(models.couple, {foreignKey: 'tournamentId'});
     tournament.hasMany(models.partido,{foreignKey: 'tournamentId' } );
     tournament.hasMany(models.couplePreviousRound, {foreignKey: 'tournamentId' });

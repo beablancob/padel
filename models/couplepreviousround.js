@@ -18,7 +18,11 @@ module.exports = (sequelize, DataTypes) => {
   }, {});
   couplePreviousRound.associate = function(models) {
     // associations can be defined here
+
+    //Asocio con el id de la pareja 
     couplePreviousRound.belongsTo(models.couple, {foreignKey: 'coupleId'});
+
+    //Asocio con el id torneo
     couplePreviousRound.belongsTo(models.tournament, {foreignKey: 'tournamentId'});
 
   };
