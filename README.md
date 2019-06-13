@@ -16,7 +16,7 @@ Para instalar y ejecutar correctamente será necesario:
 9. Obtener una clave para usar la API de [SendGrid](https://sendgrid.com/).
 10. Abrir el archivo 'config/config.json' y modificar:
 
-	* Los valores para comunicarse con la base de datos. Usuario, contraseña, nombre de la base de datos y dirección. El dialecto no se debe modificar.
+	* Los valores para comunicarse con la base de datos. Usuario, contraseña, nombre de la base de datos y dirección. El valor de `dialect` no se debe modificar.
 	* La cadena de texto secreta para encriptar el JSON Web Token.
 	* La clave de la API de SendGrid para que la aplicación pueda enviar emails.
 
