@@ -4,6 +4,7 @@ const bcrypt = require('bcrypt');
 const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
 const userController = require('../controllers/user');
+const config = require(__dirname + '/../config/config.json');
 
 const sendgridTransport = require('nodemailer-sendgrid-transport');
 const nodemailer = require('nodemailer');
@@ -12,7 +13,7 @@ const transporter = nodemailer.createTransport(sendgridTransport({
 
   auth: {
     
-    api_key:'tuclave'
+    api_key: config.sendgridKey
   }
 }));
 
@@ -415,7 +416,7 @@ u.save();
 
 
 //Crear nuevo token
-const newToken = await jwt.sign({user: u}, "secreto", {
+const newToken = await jwt.sign({user: u}, config.jwtSecret, {
     expiresIn: 24 * 60 * 1000
 
 });

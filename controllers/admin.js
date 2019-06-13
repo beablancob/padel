@@ -4,6 +4,7 @@ const Combinatorics = require('js-combinatorics');
 const {user, tournament, couple, partido, couplePreviousRound} = require('../models/index');
 const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
+const config = require(__dirname + '/../config/config.json');
 
 const sendgridTransport = require('nodemailer-sendgrid-transport');
 const nodemailer = require('nodemailer');
@@ -12,7 +13,7 @@ const transporter = nodemailer.createTransport(sendgridTransport({
 
   auth: {
     
-    api_key:'tuclave'
+    api_key: config.sendgridKey
   }
 }));
 

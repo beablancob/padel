@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 const {user, tournament, couple, partido} = require('../models/index');
 const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
+const config = require(__dirname + '/../config/config.json');
 
 
 const sendgridTransport = require('nodemailer-sendgrid-transport');
@@ -12,7 +13,7 @@ const transporter = nodemailer.createTransport(sendgridTransport({
 
   auth: {
     
-    api_key:'tuclave'
+    api_key: config.sendgridKey
   }
 }));
 
@@ -117,7 +118,7 @@ exports.postSignIn = (req,res,next) => {
         }
 
         //Secreto importarlo desde .config por ejemplo
-        const token = jwt.sign({user: user}, "secreto", {
+        const token = jwt.sign({user: user}, config.jwtSecret, {
             expiresIn: 24 * 60 * 1000
 
         });
@@ -144,7 +145,7 @@ exports.verifyToken = (req,res, next) => {
     }
 
 
-    jwt.verify(token, "secreto", (err, decoded) => {
+    jwt.verify(token, config.jwtSecret, (err, decoded) => {
         if(err){
             return res.status(400).json({error: "El token no es válido"});
         }
