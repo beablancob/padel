@@ -517,7 +517,7 @@ exports.getRondaInfo = async(req, res, next) => {
     //Si es la ronda actual cogemos couples y los partidos de ahora
     if(req.tourney.rondaActual == req.params.numeroRonda){
         parejas = await tourney.getCouples({order: [
-            ['grupo','ASC'],
+            ['grupoActual','ASC'],
             ['puntos', 'DESC'],
             ['diferenciaSets', 'DESC'],
             ['diferenciaJuegos', 'DESC']
