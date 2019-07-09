@@ -416,18 +416,29 @@ u.save();
 
 
 //Crear nuevo token
-const newToken = await jwt.sign({user: u}, config.jwtSecret, {
+const newToken = await jwt.sign({id: u.id}, config.jwtSecret, {
     expiresIn: 24 * 60 * 1000
 
 });
 
 
 
-return res.status(200).json({edited: true,user: u, newToken: newToken });
+return res.status(200).json({edited: true,id: u.id, newToken: newToken });
     
 
 
 };
+
+exports.getUserInfo = async(req, res, next) => {
+
+    u = await user.findOne({where:{
+        id: req.userId
+    }
+    })
+
+    return res.status(200).json({user: u});
+
+}
 
 exports.tournamentRegister = async(req, res, next) => {
     

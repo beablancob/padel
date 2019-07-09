@@ -118,7 +118,7 @@ exports.postSignIn = (req,res,next) => {
         }
 
         //Secreto importarlo desde .config por ejemplo
-        const token = jwt.sign({user: user}, config.jwtSecret, {
+        const token = jwt.sign({id: user.id}, config.jwtSecret, {
             expiresIn: 24 * 60 * 1000
 
         });
@@ -149,9 +149,17 @@ exports.verifyToken = (req,res, next) => {
         if(err){
             return res.status(400).json({error: "El token no es válido"});
         }
-        req.userId = decoded.user.id;
-        req.user = decoded.user;
-        
+        req.userId = decoded.id;
+
+        user.findOne({
+            where: {
+                id: req.userId
+            }
+        })
+        .then(user => {
+        req.user = user;
+        });
+
 
         next();
     })

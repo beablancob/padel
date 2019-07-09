@@ -105,6 +105,12 @@ app.get('/tournaments/:tournamentId/ronda/:numeroRonda', userRouter);
 //Obtener torneos en los que juego, query publicos
 app.get('/tournaments', userRouter);
 
+//Dejo el :userId por si en algun momento se da el caso que existan adminsitradores de la plataforma
+//Aunque para el funcionamiento de ahora no es necesario
+
+//Obtener datos usuario
+app.get('/users/:userId', userRouter);
+
 //Editar datos de usuario
 app.put('/users/:userId', userRouter);
 

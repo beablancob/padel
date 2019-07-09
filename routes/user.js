@@ -16,6 +16,9 @@ router.get('/tournaments/:tournamentId/ronda/:numeroRonda', authController.verif
 //Editar info usuario
 router.put('/users/:userId', authController.verifyToken, userController.editInfo);
 
+//Obtener info de usuario
+router.get('/users/:userId', authController.verifyToken, userController.getUserInfo);
+
 //Eliminar cuenta propia
 router.delete('/users/:userId', authController.verifyToken, userController.deleteUser);
 
