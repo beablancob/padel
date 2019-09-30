@@ -1,159 +1,171 @@
-const {user, tournament, couple, partido, couplePreviousRound} = require('../models/index');
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
-const Sequelize = require('sequelize');
+const {
+  user,
+  tournament,
+  couple,
+  partido,
+  couplePreviousRound
+} = require("../models/index");
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
+const Sequelize = require("sequelize");
 const Op = Sequelize.Op;
-const userController = require('../controllers/user');
-const config = require(__dirname + '/../config/config.json');
+const userController = require("../controllers/user");
+const config = require(__dirname + "/../config/config.json");
 
-const sendgridTransport = require('nodemailer-sendgrid-transport');
-const nodemailer = require('nodemailer');
+const sendgridTransport = require("nodemailer-sendgrid-transport");
+const nodemailer = require("nodemailer");
 
-const transporter = nodemailer.createTransport(sendgridTransport({
-
-  auth: {
-    
-    api_key: config.sendgridKey
-  }
-}));
-
-
-
-//Obtener torneos 
- exports.getTournaments = async (req, res, next) => {
-
-    if(req.query.publico == "true"){
-
-    tournament.findAll({
-        where: {
-            
-            publico: true
-
-        }
-    }).then(torneosPublicos => {
-
-        if(torneosPublicos.length == 0){
-            return res.status(200).json({mensaje: "No hay ningún torneo público"})
-        }else{
-            return res.status(200).json({tournaments: torneosPublicos});
-        }
-    }).catch(err => {
-        return res.status(400).json({error: err});
-
-    })
-
-    }else{
-
-    
-
-//     //Cojo parejas en las que estoy
-const parejasQueEstoy = await couple.findAll({where:{
-    [Op.or]: [{user1Id: req.userId}, {user2Id: req.userId}]
-
-}
-});
-
-if(parejasQueEstoy.length == 0){
-  return res.status(200).json({msg: "No pertenece a ningún torneo"});
-}
-
-let idsTorneos = [];
-
-//Por cada pareja en la que estoy selecciono el id del torneo al que pertenece 
-for(p of parejasQueEstoy){
-  idsTorneos.push(p.tournamentId);
-};
-
-//Busco los torneos en los que estoy con los ids de las parejas de antes
- const torneosQueEstoy = await tournament.findAll({where:{
-   id:{
-    [Op.or]: [idsTorneos]
-
-   }
- }
-});
-
-return res.status(200).json({tournaments: torneosQueEstoy, couples: parejasQueEstoy});
+const transporter = nodemailer.createTransport(
+  sendgridTransport({
+    auth: {
+      api_key: config.sendgridKey
     }
-    };
+  })
+);
+
+//Obtener torneos
+exports.getTournaments = async (req, res, next) => {
+  if (req.query.publico == "true") {
+    tournament
+      .findAll({
+        where: {
+          publico: true
+        },
+        include: [couple]
+      })
+      .then(torneosPublicos => {
+        if (torneosPublicos.length == 0) {
+          return res
+            .status(200)
+            .json({ mensaje: "No hay ningún torneo público" });
+        } else {
+          return res.status(200).json({ tournaments: torneosPublicos });
+        }
+      })
+      .catch(err => {
+        return res.status(400).json({ error: err });
+      });
+  } else {
+    //     //Cojo parejas en las que estoy
+    const parejasQueEstoy = await couple.findAll({
+      where: {
+        [Op.or]: [{ user1Id: req.userId }, { user2Id: req.userId }]
+      }
+    });
+
+    if (parejasQueEstoy.length == 0) {
+      return res.status(200).json({ msg: "No pertenece a ningún torneo" });
+    }
+
+    let idsTorneos = [];
+
+    //Por cada pareja en la que estoy selecciono el id del torneo al que pertenece
+    for (p of parejasQueEstoy) {
+      idsTorneos.push(p.tournamentId);
+    }
+
+    //Busco los torneos en los que estoy con los ids de las parejas de antes
+    const torneosQueEstoy = await tournament.findAll({
+      where: {
+        id: {
+          [Op.or]: [idsTorneos]
+        }
+      }
+    });
+
+    return res
+      .status(200)
+      .json({ tournaments: torneosQueEstoy, couples: parejasQueEstoy });
+  }
+};
 
 //Obtener datos torneo
 exports.getTournament = async (req, res, next) => {
-    
-    //Buscamos el torneo
-    tourney = await tournament.findOne({where:
-    {
-        id:req.params.tournamentId
-    }, include:[couple]
+  //Buscamos el torneo
+  tourney = await tournament.findOne({
+    where: {
+      id: req.params.tournamentId
+    },
+    include: [couple]
+  });
 
-});
+  //Obtener los nombres y los correos de los jugadores que forman las parejas
+  //nombresDelTorneo = [];
+  for (c of tourney.couples) {
+    user1 = await user.findOne({
+      where: {
+        id: c.user1Id
+      }
+    });
+    user2 = await user.findOne({
+      where: {
+        id: c.user2Id
+      }
+    });
+    c.dataValues.user1Name = user1.name;
+    c.dataValues.user1LastName = user1.lastname;
+    c.dataValues.user2Name = user2.name;
+    c.dataValues.user2LastName = user2.lastname;
+    //nombresDelTorneo.push(c.id, user1.name + " " + user1.lastname);
+    //nombresDelTorneo.push(user2.name + " " + user2.lastname);
+  }
 
-//Obtener los nombres y los correos de los jugadores que forman las parejas
-         nombresDelTorneo = [];
-for(c of tourney.couples){
-
-    user1 = await user.findOne({where:{
-      id: c.user1Id
-    }});
-    user2 = await user.findOne({where:{
-      id: c.user2Id
-    }});
-    nombresDelTorneo.push(c.id,user1.name + " " + user1.lastname);
-    nombresDelTorneo.push( user2.name + " " + user2.lastname);
-
-}
-
-    
-    
-    return res.status(200).json({tournament: tourney,nombres:nombresDelTorneo });
-
+  return (
+    res
+      .status(200)
+      //.json({ tournament: tourney, nombres: nombresDelTorneo });
+      .json({ tournament: tourney })
+  );
 };
 
-exports.editResultPartido = async(req, res, next) => {
-
-
-    //Buscar partido
-    match = await partido.findOne({where:
-    {
-        id: req.params.partidoId
-    }});
-
-    if(match.jugado == true){
-        return res.status(400).json({error:"El resultado ya fue confirmado"});
+exports.editResultPartido = async (req, res, next) => {
+  //Buscar partido
+  match = await partido.findOne({
+    where: {
+      id: req.params.partidoId
     }
+  });
 
-    tourney = await tournament.findOne({where:
-    {
-        id: match.tournamentId
-    }})
+  if (match.jugado == true) {
+    return res.status(400).json({ error: "El resultado ya fue confirmado" });
+  }
 
-    //Ver que modificamos un partido de la ronda actual
-    if(tourney.rondaActual != match.numeroRonda){
-        return res.status(400).json({error:"No puedes modificar un resultado de una ronda que no es la actual"});
+  tourney = await tournament.findOne({
+    where: {
+      id: match.tournamentId
     }
+  });
 
-    const sets = req.body.sets;
+  //Ver que modificamos un partido de la ronda actual
+  if (tourney.rondaActual != match.numeroRonda) {
+    return res.status(400).json({
+      error: "No puedes modificar un resultado de una ronda que no es la actual"
+    });
+  }
+
+  const sets = req.body.sets;
 
   //Obtener los sets del body y añadirselos al partido
   //Comprobar que hay 6 sets y que ninguno es nulo
-  if(Object.keys(sets).length != 6){
-    return res.status(400).json({error: "El numero de sets total no es correcto"})
+  if (Object.keys(sets).length != 6) {
+    return res
+      .status(400)
+      .json({ error: "El numero de sets total no es correcto" });
   }
 
-  for(set of sets) {
-    if(set == null ){
-      return res.status(400).json({error: "Error en un set"});
+  for (set of sets) {
+    if (set == null) {
+      return res.status(400).json({ error: "Error en un set" });
     }
-
   }
 
-  let juegospareja1 = sets[0]+sets[1]+sets[2];
-  let juegospareja2 = sets[3]+sets[4]+sets[5];
+  let juegospareja1 = sets[0] + sets[1] + sets[2];
+  let juegospareja2 = sets[3] + sets[4] + sets[5];
 
-  if(juegospareja1 === juegospareja2){
-    return res.status(400).json({error: "Error en los juegos introducidos"})
+  if (juegospareja1 === juegospareja2) {
+    return res.status(400).json({ error: "Error en los juegos introducidos" });
   }
-  
+
   //Sets pareja 1
   set1Couple1 = sets[0];
   set2Couple1 = sets[1];
@@ -170,20 +182,17 @@ exports.editResultPartido = async(req, res, next) => {
   match.set1Couple2 = set1Couple2;
   match.set2Couple2 = set2Couple2;
   match.set3Couple2 = set3Couple2;
-    
+
   //Vemos quien gana
 
-  if(juegospareja1 > juegospareja2){
+  if (juegospareja1 > juegospareja2) {
     match.ganador = match.couple1Id;
-    
-
-  }else {
+  } else {
     match.ganador = match.couple2Id;
   }
 
-    //Poner que pareja ha editado el partido
-    match.parejaEditedId = req.couple.id;
-
+  //Poner que pareja ha editado el partido
+  match.parejaEditedId = req.couple.id;
 
   //No ponemos true en este metodo, si en confirmar
   //partido.jugado = true;
@@ -193,584 +202,571 @@ exports.editResultPartido = async(req, res, next) => {
   //Enviar correo para a la otra pareja para confirmar el resultado
 
   //Obtener la pareja a la que enviar el correo
-//   if(match.couple1Id == req.couple.id){
-//       confirmCoupleId = match.couple2Id;
-//   }else{
-//       confirmCoupleId = match.couple1Id;
-//   }
+  //   if(match.couple1Id == req.couple.id){
+  //       confirmCoupleId = match.couple2Id;
+  //   }else{
+  //       confirmCoupleId = match.couple1Id;
+  //   }
 
-//   confirmCouple = await couple.findOne({where:{
-//       id: confirmCoupleId
-//   }})
+  //   confirmCouple = await couple.findOne({where:{
+  //       id: confirmCoupleId
+  //   }})
 
-//   //Buscar el correo de los 2 jugadores
-//   user1 = await user.findOne({where:{
-//       id: confirmCouple.user1Id
-//   }});
+  //   //Buscar el correo de los 2 jugadores
+  //   user1 = await user.findOne({where:{
+  //       id: confirmCouple.user1Id
+  //   }});
 
-//   user2 = await user.findOne({where:{
-//     id: confirmCouple.user2Id
-// }});
+  //   user2 = await user.findOne({where:{
+  //     id: confirmCouple.user2Id
+  // }});
 
-// emails = [user1.email,user2.email];
+  // emails = [user1.email,user2.email];
 
-//   transporter.sendMail({
-//     to:emails,
-//     from: 'tfg@padel.com',
-//     subject:'TFG PÁDEL',
-//     html:'<h1> Puedes confirmar el partido</h1>'
-// })
+  //   transporter.sendMail({
+  //     to:emails,
+  //     from: 'tfg@padel.com',
+  //     subject:'TFG PÁDEL',
+  //     html:'<h1> Puedes confirmar el partido</h1>'
+  // })
 
-  
- //Devolvemos el partido con los datos actualizados
-    return res.status(200).json({edited:"true",partido: match})
-
-
-
+  //Devolvemos el partido con los datos actualizados
+  return res.status(200).json({ edited: "true", partido: match });
 };
 
-exports.confirmResultPartido = async(req, res, next) => {
+exports.confirmResultPartido = async (req, res, next) => {
+  match = await partido.findOne({
+    where: {
+      id: req.params.partidoId
+    }
+  });
 
-    match = await partido.findOne({where:
-        {
-            id: req.params.partidoId
-        }});
+  tourney = await tournament.findOne({
+    where: {
+      id: match.tournamentId
+    }
+  });
 
-        tourney = await tournament.findOne({where:{
-        id: match.tournamentId
-    }})
+  //Como pasamos antes el middleware de isPlayingPartido,
+  //solo comprobamos que no sea el mismo id que parejaEditedId
+  console.log(req.couple.id);
+  if (req.couple.id != match.parejaEditedId && match.jugado != true) {
+    //Ponemos el partido como jugado
+    match.jugado = true;
+    match.save();
 
-    
-    
-    //Como pasamos antes el middleware de isPlayingPartido,
-    //solo comprobamos que no sea el mismo id que parejaEditedId
-    console.log(req.couple.id);
-    if(req.couple.id != match.parejaEditedId && match.jugado != true){
-        
-        //Ponemos el partido como jugado
-        match.jugado = true;
-        match.save();
+    //Cogemos las 2 parejas y actualizamos valores
 
-          //Cogemos las 2 parejas y actualizamos valores
+    couple1 = await couple.findOne({
+      where: {
+        id: match.couple1Id
+      }
+    });
 
-        couple1 = await couple.findOne({where:{
-            id: match.couple1Id
-        }});
-      
-        couple2 = await couple.findOne({where:{
-            id: match.couple2Id
-        }});
+    couple2 = await couple.findOne({
+      where: {
+        id: match.couple2Id
+      }
+    });
 
-        let juegospareja1 = match.set1Couple1+match.set2Couple1+match.set3Couple1;
-        let juegospareja2 = match.set1Couple2+match.set2Couple2+match.set3Couple2;
+    let juegospareja1 =
+      match.set1Couple1 + match.set2Couple1 + match.set3Couple1;
+    let juegospareja2 =
+      match.set1Couple2 + match.set2Couple2 + match.set3Couple2;
 
+    //Actualizar partidos jugados
+    couple1.partidosJugados = couple1.partidosJugados + 1;
+    couple2.partidosJugados = couple2.partidosJugados + 1;
 
-  //Actualizar partidos jugados
-  couple1.partidosJugados = couple1.partidosJugados + 1;
-  couple2.partidosJugados = couple2.partidosJugados + 1;
-
-  if( match.set1Couple1 > match.set1Couple2){
-    couple1.setsGanados = couple1.setsGanados + 1;
-    couple1.diferenciaSets = couple1.diferenciaSets + 1;
-    couple2.setsPerdidos = couple2.setsPerdidos + 1;
-    couple2.diferenciaSets = couple2.diferenciaSets - 1;
-    
-    
-  } else{
-    couple1.setsPerdidos = couple1.setsPerdidos + 1;
-    couple2.setsGanados = couple2.setsGanados + 1;
-    couple1.diferenciaSets = couple1.diferenciaSets - 1;
-    couple2.diferenciaSets = couple2.diferenciaSets + 1;
-  }
-  //Set 2
-  if( match.set2Couple1 > match.set2Couple2){
-    couple1.setsGanados = couple1.setsGanados + 1;
-    couple1.diferenciaSets = couple1.diferenciaSets + 1;
-    couple2.setsPerdidos = couple2.setsPerdidos + 1;
-    couple2.diferenciaSets = couple2.diferenciaSets - 1;
-   
- } else{
-    couple1.setsPerdidos = couple1.setsPerdidos + 1;
-   couple2.setsGanados = couple2.setsGanados + 1;
-   couple1.diferenciaSets = couple1.diferenciaSets - 1;
-   couple2.diferenciaSets = couple2.diferenciaSets + 1;
- }
- //Set 3
- if( match.set3Couple1 > match.set3Couple2){
-     
-    couple1.setsGanados = couple1.setsGanados + 1;
-    couple1.diferenciaSets = couple1.diferenciaSets + 1;
-    couple2.setsPerdidos = couple2.setsPerdidos + 1;
-    couple2.diferenciaSets = couple2.diferenciaSets - 1;
-   
- } else if (match.set3Couple1 < match.set3Couple2){
-    couple1.setsPerdidos = couple1.setsPerdidos + 1;
-   couple2.setsGanados = couple2.setsGanados + 1;
-   couple1.diferenciaSets = couple1.diferenciaSets - 1;
-   couple2.diferenciaSets = couple2.diferenciaSets + 1;
- }
-
-
- //Actualizar partidos ganados y partidos perdidos 
- if(juegospareja1 > juegospareja2){
-    match.ganador = match.couple1Id;
-    couple1.partidosGanados = couple1.partidosGanados + 1;
-    couple2.partidosPerdidos = couple2.partidosPerdidos + 1;
-
-    //Actualizar puntos
-    couple1.puntos = couple1.puntos + tourney.puntosPG;
-    couple2.puntos = couple2.puntos + tourney.puntosPP;
-
-    
-
-  }else {
-    match.ganador = match.couple2Id;
-
-    couple1.partidosPerdidos = couple1.partidosPerdidos + 1;
-    couple2.partidosGanados = couple2.partidosGanados + 1;
-
-    couple1.puntos = couple1.puntos + tourney.puntosPP;
-    couple2.puntos = couple2.puntos + tourney.puntosPG;
-
-  }
-
-  couple1.juegosGanados = couple1.juegosGanados + juegospareja1;
-  couple2.juegosGanados = couple2.juegosGanados + juegospareja2;
-  couple1.juegosPerdidos = couple1.juegosPerdidos + juegospareja2;
-  couple2.juegosPerdidos = couple2.juegosPerdidos + juegospareja1;
-  //Actualizar diferencia y diferencia de juegos
-
-  couple1.diferenciaJuegos = couple1.diferenciaJuegos + (juegospareja1 - juegospareja2);
-  couple2.diferenciaJuegos = couple2.diferenciaJuegos + (juegospareja2 - juegospareja1);
-
- //Guardamos en la bbdd
- await couple1.save();
- await couple2.save();
-
-
-//Enviar correo una vez confirmado a la pareja que editó
-
-// editedCouple = await couple.findOne({where:{
-//     id: match.parejaEditedId
-// }})
-
-// //Buscar el correo de los 2 jugadores
-// user1 = await user.findOne({where:{
-//     id: editedCouple.user1Id
-// }});
-
-// user2 = await user.findOne({where:{
-//   id: editedCouple.user2Id
-// }});
-
-// emails = [user1.email,user2.email];
-
-// transporter.sendMail({
-//   to:emails,
-//   from: 'tfg@padel.com',
-//   subject:'TFG PÁDEL',
-//   html:'<h1> El resultado fue confirmado</h1>'
-// })
-
-        
-
-        return res.status(200).json({confirmed: "true", partido: match});
-        
+    if (match.set1Couple1 > match.set1Couple2) {
+      couple1.setsGanados = couple1.setsGanados + 1;
+      couple1.diferenciaSets = couple1.diferenciaSets + 1;
+      couple2.setsPerdidos = couple2.setsPerdidos + 1;
+      couple2.diferenciaSets = couple2.diferenciaSets - 1;
+    } else {
+      couple1.setsPerdidos = couple1.setsPerdidos + 1;
+      couple2.setsGanados = couple2.setsGanados + 1;
+      couple1.diferenciaSets = couple1.diferenciaSets - 1;
+      couple2.diferenciaSets = couple2.diferenciaSets + 1;
+    }
+    //Set 2
+    if (match.set2Couple1 > match.set2Couple2) {
+      couple1.setsGanados = couple1.setsGanados + 1;
+      couple1.diferenciaSets = couple1.diferenciaSets + 1;
+      couple2.setsPerdidos = couple2.setsPerdidos + 1;
+      couple2.diferenciaSets = couple2.diferenciaSets - 1;
+    } else {
+      couple1.setsPerdidos = couple1.setsPerdidos + 1;
+      couple2.setsGanados = couple2.setsGanados + 1;
+      couple1.diferenciaSets = couple1.diferenciaSets - 1;
+      couple2.diferenciaSets = couple2.diferenciaSets + 1;
+    }
+    //Set 3
+    if (match.set3Couple1 > match.set3Couple2) {
+      couple1.setsGanados = couple1.setsGanados + 1;
+      couple1.diferenciaSets = couple1.diferenciaSets + 1;
+      couple2.setsPerdidos = couple2.setsPerdidos + 1;
+      couple2.diferenciaSets = couple2.diferenciaSets - 1;
+    } else if (match.set3Couple1 < match.set3Couple2) {
+      couple1.setsPerdidos = couple1.setsPerdidos + 1;
+      couple2.setsGanados = couple2.setsGanados + 1;
+      couple1.diferenciaSets = couple1.diferenciaSets - 1;
+      couple2.diferenciaSets = couple2.diferenciaSets + 1;
     }
 
-    return res.status(401).json({error:"Tiene que confirmar un miembro de la otra pareja el resultado"});       
+    //Actualizar partidos ganados y partidos perdidos
+    if (juegospareja1 > juegospareja2) {
+      match.ganador = match.couple1Id;
+      couple1.partidosGanados = couple1.partidosGanados + 1;
+      couple2.partidosPerdidos = couple2.partidosPerdidos + 1;
 
+      //Actualizar puntos
+      couple1.puntos = couple1.puntos + tourney.puntosPG;
+      couple2.puntos = couple2.puntos + tourney.puntosPP;
+    } else {
+      match.ganador = match.couple2Id;
+
+      couple1.partidosPerdidos = couple1.partidosPerdidos + 1;
+      couple2.partidosGanados = couple2.partidosGanados + 1;
+
+      couple1.puntos = couple1.puntos + tourney.puntosPP;
+      couple2.puntos = couple2.puntos + tourney.puntosPG;
+    }
+
+    couple1.juegosGanados = couple1.juegosGanados + juegospareja1;
+    couple2.juegosGanados = couple2.juegosGanados + juegospareja2;
+    couple1.juegosPerdidos = couple1.juegosPerdidos + juegospareja2;
+    couple2.juegosPerdidos = couple2.juegosPerdidos + juegospareja1;
+    //Actualizar diferencia y diferencia de juegos
+
+    couple1.diferenciaJuegos =
+      couple1.diferenciaJuegos + (juegospareja1 - juegospareja2);
+    couple2.diferenciaJuegos =
+      couple2.diferenciaJuegos + (juegospareja2 - juegospareja1);
+
+    //Guardamos en la bbdd
+    await couple1.save();
+    await couple2.save();
+
+    //Enviar correo una vez confirmado a la pareja que editó
+
+    // editedCouple = await couple.findOne({where:{
+    //     id: match.parejaEditedId
+    // }})
+
+    // //Buscar el correo de los 2 jugadores
+    // user1 = await user.findOne({where:{
+    //     id: editedCouple.user1Id
+    // }});
+
+    // user2 = await user.findOne({where:{
+    //   id: editedCouple.user2Id
+    // }});
+
+    // emails = [user1.email,user2.email];
+
+    // transporter.sendMail({
+    //   to:emails,
+    //   from: 'tfg@padel.com',
+    //   subject:'TFG PÁDEL',
+    //   html:'<h1> El resultado fue confirmado</h1>'
+    // })
+
+    return res.status(200).json({ confirmed: "true", partido: match });
+  }
+
+  return res.status(401).json({
+    error: "Tiene que confirmar un miembro de la otra pareja el resultado"
+  });
 };
 
-exports.editInfo = async(req, res, next) => {
+exports.editInfo = async (req, res, next) => {
+  if (!req.params.userId) {
+    return res.status(400).json({ error: "No envió el id de usuario" });
+  }
 
-    if(!req.params.userId){
-        return res.status(400).json({error:"No envió el id de usuario"})
+  if (req.params.userId != req.userId) {
+    return res.status(403).json({ error: "El id de usuario no es el suyo" });
+  }
+
+  u = await user.findOne({
+    where: {
+      id: req.userId
     }
+  });
 
-    if(req.params.userId != req.userId){
-        return res.status(403).json({error:"El id de usuario no es el suyo"})
-    }
-    
-    
-  u = await user.findOne({where:{
-    id: req.userId
-    }});
+  if (
+    req.body.password1 &&
+    req.body.password2 &&
+    req.body.password1 != req.body.password2
+  ) {
+    return res.status(400).json({ error: "Fallo en las contraseñas" });
+  }
+  let password;
+  //Si envia password encriptarlo con bcrypt
+  if (req.body.password) {
+    password = await bcrypt.hashSync(req.body.password, 10);
+  }
 
-    if(req.body.password1 && req.body.password2 && req.body.password1 != req.body.password2){
-        return res.status(400).json({error:"Fallo en las contraseñas"})
-    }
-    let password;
-    //Si envia password encriptarlo con bcrypt
-    if(req.body.password){
-    password = await bcrypt.hashSync(req.body.password,10);
-    }
+  u.email = req.body.email || u.email.trim().toLowerCase();
+  u.name = req.body.name || u.name;
+  u.lastname = req.body.lastname || u.lastname;
+  u.password = password || u.password;
 
+  u.save();
 
-u.email = req.body.email || u.email.trim().toLowerCase();
-u.name = req.body.name || u.name;
-u.lastname = req.body.lastname || u.lastname;
-u.password = password || u.password;
-
-u.save();
-
-
-//Crear nuevo token
-const newToken = await jwt.sign({id: u.id}, config.jwtSecret, {
+  //Crear nuevo token
+  const newToken = await jwt.sign({ id: u.id }, config.jwtSecret, {
     expiresIn: 24 * 60 * 1000
+  });
 
-});
-
-
-
-return res.status(200).json({edited: true,id: u.id, newToken: newToken });
-    
-
-
+  return res.status(200).json({ edited: true, id: u.id, newToken: newToken });
 };
 
-exports.getUserInfo = async(req, res, next) => {
-
-    u = await user.findOne({where:{
-        id: req.userId
+exports.getUserInfo = async (req, res, next) => {
+  u = await user.findOne({
+    where: {
+      id: req.userId
     }
-    })
+  });
 
-    return res.status(200).json({user: u});
+  return res.status(200).json({ user: u });
+};
 
-}
-
-exports.tournamentRegister = async(req, res, next) => {
-    
-    if(!req.params.registerCode){
-        return res.status(400).json({error: "No envió un link de torneo"})
+exports.tournamentRegister = async (req, res, next) => {
+  if (!req.params.registerCode) {
+    return res.status(400).json({ error: "No envió un link de torneo" });
+  }
+  //Buscamos el torneo con el parametro registerCode
+  tourney = await tournament.findOne({
+    where: {
+      registerCode: req.params.registerCode
     }
-    //Buscamos el torneo con el parametro registerCode
-    tourney = await tournament.findOne({where:{
-        registerCode: req.params.registerCode }});
+  });
 
-    if(!tourney){
-        return res.status(400).json({error: "No existe ningun torneo con ese id"})
-        
+  if (!tourney) {
+    return res
+      .status(400)
+      .json({ error: "No existe ningun torneo con ese id" });
+  }
+  if (tourney.rondaActual != 0) {
+    return res.status(403).json({ error: "El torneo ya ha comenzado" });
+  }
+
+  //Vemos si ya estamos registrados en el torneo
+  coup = await couple.findOne({
+    where: {
+      tournamentId: tourney.id,
+      [Op.or]: [{ user1Id: req.userId }, { user2Id: req.userId }]
     }
-    if(tourney.rondaActual != 0){
-        return res.status(403).json({error: "El torneo ya ha comenzado"})
+  });
+
+  //Si estamos registrados devolver la pareja
+  if (coup) {
+    return res
+      .status(403)
+      .json({ error: "Ya está registrado en este torneo", couple: coup });
+  }
+
+  //Creamos la pareja de ese torneo
+  if (req.body.emailUser2) {
+    //Buscar usuario de nuestra pareja
+    user2 = await user.findOne({
+      where: {
+        email: req.body.emailUser2
+      }
+    });
+
+    if (!user2) {
+      return res
+        .status(400)
+        .json({ error: "No existe ningún usuario con ese email" });
     }
 
-    //Vemos si ya estamos registrados en el torneo
-    coup = await couple.findOne({where:{
+    coup2 = await couple.findOne({
+      where: {
         tournamentId: tourney.id,
-        [Op.or]: [{user1Id: req.userId}, {user2Id: req.userId}]
+        [Op.or]: [{ user1Id: user2.id }, { user2Id: user2.id }]
+      }
+    });
 
+    if (coup2) {
+      return res.status(400).json({ error: "Su compañero ya está registrado" });
     }
 
-    })
+    c = await couple.create({
+      tournamentId: tourney.id,
+      user1Id: req.userId,
+      user2Id: user2.id
+    });
 
-    //Si estamos registrados devolver la pareja
-    if(coup){
-        return res.status(403).json({error:"Ya está registrado en este torneo", couple:coup})
-    }
-
- 
-    //Creamos la pareja de ese torneo
-    if(req.body.emailUser2){
-
-        //Buscar usuario de nuestra pareja
-        user2 = await user.findOne({where:{
-            email: req.body.emailUser2
-        }})
-
-        if(!user2){
-            return res.status(400).json({error:"No existe ningún usuario con ese email"})
-        }
-
-        coup2 = await couple.findOne({where:{
-            tournamentId: tourney.id,
-            [Op.or]: [{user1Id: user2.id}, {user2Id: user2.id}]
-    
-        }
-    
-        })
-        
-        if(coup2){
-            return res.status(400).json({error:"Su compañero ya está registrado"});
-
-        }
-
-        c = await couple.create({
-            tournamentId: tourney.id,
-            user1Id: req.userId,
-            user2Id: user2.id
-        }
-        )
-
-        return res.status(201).json({registered:true, couple:c});
-
-
-    }
-    return res.status(400).json({error: "No envió el email de su pareja"})
-
-
+    return res.status(201).json({ registered: true, couple: c });
+  }
+  return res.status(400).json({ error: "No envió el email de su pareja" });
 };
 
 //Obtener una ronda en concreto
-exports.getRondaInfo = async(req, res, next) => {
+exports.getRondaInfo = async (req, res, next) => {
+  if (!req.params.numeroRonda) {
+    return res.status(400).json({ error: "No ha indicado la ronda que busca" });
+  }
 
+  if (
+    req.params.numeroRonda < 1 ||
+    req.params.numeroRonda > req.tourney.rondaActual
+  ) {
+    return res
+      .status(400)
+      .json({ error: "El número de la ronda no es correcto" });
+  }
 
-    if(!req.params.numeroRonda){
-        return res.status(400).json({error: "No ha indicado la ronda que busca"});
-    }
-
-    if(req.params.numeroRonda < 1 || req.params.numeroRonda > req.tourney.rondaActual){
-        return res.status(400).json({error: "El número de la ronda no es correcto"});
-    }
-
-    //Si es la ronda actual cogemos couples y los partidos de ahora
-    if(req.tourney.rondaActual == req.params.numeroRonda){
-        parejas = await tourney.getCouples({order: [
-            ['grupoActual','ASC'],
-            ['puntos', 'DESC'],
-            ['diferenciaSets', 'DESC'],
-            ['diferenciaJuegos', 'DESC']
-          ]});
-
-          //Obtener los nombres y los correos de los jugadores que forman las parejas
-         nombresDelTorneo = [];
-          for(p of parejas){
-
-            user1 = await user.findOne({where:{
-              id: p.user1Id
-            }});
-            user2 = await user.findOne({where:{
-              id: p.user2Id
-            }});
-            nombresDelTorneo.push(p.id,user1.name + " " + user1.lastname);
-            nombresDelTorneo.push( user2.name + " " + user2.lastname);
-
-      }
-
-        
-        partidos = await tourney.getPartidos({where:
-        {
-            numeroRonda: tourney.rondaActual
-        }})
-
-
-        return res.status(200).json({parejas: parejas, partidos:partidos, nombres: nombresDelTorneo })
-    }
-
-    //Si no es la ronda actual coger las parejas de previousCouples
-    parejas = await tourney.getCouplePreviousRounds({where:{
-        ronda: req.params.numeroRonda
-
-         }, order: [
-        ['grupo','ASC'],
-        ['puntos', 'DESC'],
-        ['diferenciaSets', 'DESC'],
-        ['diferenciaJuegos', 'DESC']
-         ]
-            });
-    partidos = await tourney.getPartidos({where:{
-        numeroRonda: req.params.numeroRonda
-    }})
-
+  //Si es la ronda actual cogemos couples y los partidos de ahora
+  if (req.tourney.rondaActual == req.params.numeroRonda) {
+    parejas = await tourney.getCouples({
+      order: [
+        ["grupoActual", "ASC"],
+        ["puntos", "DESC"],
+        ["diferenciaSets", "DESC"],
+        ["diferenciaJuegos", "DESC"]
+      ]
+    });
 
     //Obtener los nombres y los correos de los jugadores que forman las parejas
     nombresDelTorneo = [];
-    for(p of parejas){
+    for (p of parejas) {
+      user1 = await user.findOne({
+        where: {
+          id: p.user1Id
+        }
+      });
+      user2 = await user.findOne({
+        where: {
+          id: p.user2Id
+        }
+      });
+      //nombresDelTorneo.push(p.id, user1.name + " " + user1.lastname);
+      //nombresDelTorneo.push(user2.name + " " + user2.lastname);
+      p.dataValues.user1Name = user1.name;
+      p.dataValues.user1LastName = user1.lastname;
+      p.dataValues.user2Name = user2.name;
+      p.dataValues.user2LastName = user2.lastname;
+    }
 
-        c = await couple.findOne({where:{
-            id: p.coupleId
-        }})
+    partidos = await tourney.getPartidos({
+      where: {
+        numeroRonda: tourney.rondaActual
+      }
+    });
 
-      user1 = await user.findOne({where:{
+    return res.status(200).json({
+      parejas: parejas,
+      partidos: partidos
+    });
+  }
+
+  //Si no es la ronda actual coger las parejas de previousCouples
+  parejas = await tourney.getCouplePreviousRounds({
+    where: {
+      ronda: req.params.numeroRonda
+    },
+    order: [
+      ["grupo", "ASC"],
+      ["puntos", "DESC"],
+      ["diferenciaSets", "DESC"],
+      ["diferenciaJuegos", "DESC"]
+    ]
+  });
+  partidos = await tourney.getPartidos({
+    where: {
+      numeroRonda: req.params.numeroRonda
+    }
+  });
+
+  //Obtener los nombres y los correos de los jugadores que forman las parejas
+  nombresDelTorneo = [];
+  for (p of parejas) {
+    c = await couple.findOne({
+      where: {
+        id: p.coupleId
+      }
+    });
+
+    user1 = await user.findOne({
+      where: {
         id: c.user1Id
-      }});
-      user2 = await user.findOne({where:{
+      }
+    });
+    user2 = await user.findOne({
+      where: {
         id: c.user2Id
-      }});
-      nombresDelTorneo.push(c.id, user1.name + " " + user1.lastname);
-      nombresDelTorneo.push( user2.name + " " + user2.lastname);
-    }
+      }
+    });
+    nombresDelTorneo.push(c.id, user1.name + " " + user1.lastname);
+    nombresDelTorneo.push(user2.name + " " + user2.lastname);
+  }
 
-    return res.status(200).json({parejas: parejas, partidos:partidos, nombres: nombresDelTorneo })
-
-    
-
+  return res
+    .status(200)
+    .json({ parejas: parejas, partidos: partidos, nombres: nombresDelTorneo });
 };
 
-exports.deleteUser = async(req,res) => {
+exports.deleteUser = async (req, res) => {
+  if (!req.params.userId) {
+    return res.status(400).json({ error: "No envió el id de usuario" });
+  }
 
-    if(!req.params.userId){
-        return res.status(400).json({error:"No envió el id de usuario"})
+  if (req.params.userId != req.userId) {
+    return res.status(403).json({ error: "El id de usuario no es el suyo" });
+  }
+
+  u = await user.findOne({
+    where: {
+      id: req.userId
     }
+  });
+  u.destroy();
 
-    if(req.params.userId != req.userId){
-        return res.status(403).json({error:"El id de usuario no es el suyo"})
-    }
-
-    u = await user.findOne({where: {
-        id: req.userId
-    }});
-    u.destroy();
-
-    return res.status(200).json({deleted: true});
-
+  return res.status(200).json({ deleted: true });
 };
 
- exports.deleteCouple = async(req, res) => {
+exports.deleteCouple = async (req, res) => {
+  if (!req.params.coupleId) {
+    return res.status(400).json({ error: "No envío el id de ninguna pareja" });
+  }
 
-    if(!req.params.coupleId){
-        return res.status(400).json({error: "No envío el id de ninguna pareja"});
+  c = await couple.findById(req.params.coupleId);
+
+  if (c) {
+    tourney = await tournament.findById(c.tournamentId);
+
+    if (
+      (c.user1Id == req.userId || c.user2Id == req.userId) &&
+      tourney.rondaActual == 0
+    ) {
+      c.destroy();
+      return res.status(200).json({ deleted: "true" });
     }
+    return res.status(400).json({ error: "La pareja no es suya" });
+  }
+  return res.status(400).json({ error: "No existe la pareja" });
+};
 
-    c = await couple.findById(req.params.coupleId);
+exports.sendMail = async (req, res) => {
+  //Enviar correo una vez confirmado a la pareja que editó
+  if (!req.body.html) {
+    return res.status(400).json({ error: "No ha enviado el body del correo" });
+  }
 
-    if(c){
-        tourney = await tournament.findById(c.tournamentId);
+  if (!req.query.to) {
+    return res
+      .status(400)
+      .json({ error: "No ha indicado el destinatario del mensaje" });
+  }
 
-        if((c.user1Id == req.userId || c.user2Id == req.userId) && tourney.rondaActual == 0){
-            c.destroy();
-            return res.status(200).json({deleted: "true"});
+  //Solo administrador
+
+  if (req.query.to == "admin") {
+    //Obtener email admin
+    admin = await user.findOne({
+      where: {
+        id: req.tourney.adminId
+      }
+    });
+
+    transporter.sendMail({
+      to: admin.email,
+      from: req.user.email,
+      subject: "TFG PÁDEL",
+      html: req.body.html
+    });
+
+    return res.status(200).json({ msg: "Email enviado correctamente" });
+  }
+
+  //Todas las parejas del torneo
+
+  if (req.query.to == "all") {
+    let emails = [];
+    //Obtener el correo de todos los usuarios
+    parejasTorneo = await req.tourney.getCouples();
+
+    for (p of parejasTorneo) {
+      user1 = await user.findOne({
+        where: {
+          id: p.user1Id
         }
-        return res.status(400).json({error: "La pareja no es suya"});
-    }
-    return res.status(400).json({error: "No existe la pareja"});
+      });
 
- };
-
-
- exports.sendMail = async(req, res) => {
-
-    //Enviar correo una vez confirmado a la pareja que editó
-    if (!req.body.html){
-        return res.status(400).json({error:"No ha enviado el body del correo"});
-    }
-
-
-    if(!req.query.to){
-        return res.status(400).json({error:"No ha indicado el destinatario del mensaje"});
-    }
-
-    //Solo administrador
-
-    if(req.query.to == "admin"){
-
-        //Obtener email admin
-        admin = await user.findOne({where:{
-            id: req.tourney.adminId
-        }})
-
-        transporter.sendMail({
-            to:admin.email,
-            from: req.user.email,
-            subject:'TFG PÁDEL',
-            html: req.body.html
-        })
-
-        return res.status(200).json({msg:"Email enviado correctamente"});
-
-    }
-
-    //Todas las parejas del torneo
-
-    if(req.query.to == "all"){
-        
-        let emails = [];
-        //Obtener el correo de todos los usuarios
-        parejasTorneo = await req.tourney.getCouples();
-
-        for(p of parejasTorneo){
-
-            user1 = await user.findOne({where:
-            {
-                id: p.user1Id
-            }})
-
-            user2 = await user.findOne({where:{
-                id:p.user2Id
-            }})
-            
-            //Meter los emails en el array de emails
-            //No enviarlo a uno mismo
-            if(req.user.email != user1.email)
-            {
-                emails.push(user1.email);
-            }
-            
-            if(req.user.email != user2.email)
-            {
-            emails.push(user2.email);
-            }
-
+      user2 = await user.findOne({
+        where: {
+          id: p.user2Id
         }
+      });
 
-        transporter.sendMail({
-            to:emails,
-            from: req.user.email,
-            subject:'TFG PÁDEL',
-            html: req.body.html
-        })
+      //Meter los emails en el array de emails
+      //No enviarlo a uno mismo
+      if (req.user.email != user1.email) {
+        emails.push(user1.email);
+      }
 
-        return res.status(200).json({msg:"Emails enviados correctamente"});
-
-
+      if (req.user.email != user2.email) {
+        emails.push(user2.email);
+      }
     }
 
-    if(req.query.to == "group"){
+    transporter.sendMail({
+      to: emails,
+      from: req.user.email,
+      subject: "TFG PÁDEL",
+      html: req.body.html
+    });
 
-        let emails = [];
+    return res.status(200).json({ msg: "Emails enviados correctamente" });
+  }
 
-        
+  if (req.query.to == "group") {
+    let emails = [];
 
-        //Obtener el correo de todos los usuarios del grupo
-        parejasTorneo = await req.tourney.getCouples({where:{
-            grupoActual: req.parejaUsuario.grupoActual
-        }});
+    //Obtener el correo de todos los usuarios del grupo
+    parejasTorneo = await req.tourney.getCouples({
+      where: {
+        grupoActual: req.parejaUsuario.grupoActual
+      }
+    });
 
-        for(p of parejasTorneo){
-
-            user1 = await user.findOne({where:
-            {
-                id: p.user1Id
-            }})
-
-            user2 = await user.findOne({where:{
-                id:p.user2Id
-            }})
-            
-            //Meter los emails en el array de emails
-            //No enviarlo a uno mismo
-            if(req.user.email != user1.email)
-            {
-                emails.push(user1.email);
-            }
-            
-            if(req.user.email != user2.email)
-            {
-            emails.push(user2.email);
-            }
-
+    for (p of parejasTorneo) {
+      user1 = await user.findOne({
+        where: {
+          id: p.user1Id
         }
+      });
 
-        transporter.sendMail({
-            to:emails,
-            from: req.user.email,
-            subject:'TFG PÁDEL',
-            html: req.body.html
-        })
+      user2 = await user.findOne({
+        where: {
+          id: p.user2Id
+        }
+      });
 
-        return res.status(200).json({msg:"Emails enviados correctamente"});
+      //Meter los emails en el array de emails
+      //No enviarlo a uno mismo
+      if (req.user.email != user1.email) {
+        emails.push(user1.email);
+      }
 
-
+      if (req.user.email != user2.email) {
+        emails.push(user2.email);
+      }
     }
 
-    return res.status(400).json({error: "El parámetro to no es correcto"});
+    transporter.sendMail({
+      to: emails,
+      from: req.user.email,
+      subject: "TFG PÁDEL",
+      html: req.body.html
+    });
 
+    return res.status(200).json({ msg: "Emails enviados correctamente" });
+  }
 
-
-
-
-
- }
-
+  return res.status(400).json({ error: "El parámetro to no es correcto" });
+};
