@@ -65,13 +65,24 @@ exports.getTournaments = async (req, res, next) => {
     }
 
     //Busco los torneos en los que estoy con los ids de las parejas de antes
-    const torneosQueEstoy = await tournament.findAll({
-      where: {
-        id: {
-          [Op.or]: [idsTorneos]
+    const torneosQueEstoy = await tournament.findAll(
+      {
+        include: [
+          {
+            // Notice `include` takes an ARRAY
+            model: couple,
+            as: "couples"
+          }
+        ]
+      },
+      {
+        where: {
+          id: {
+            [Op.or]: [idsTorneos]
+          }
         }
       }
-    });
+    );
 
     return res
       .status(200)
@@ -86,7 +97,8 @@ exports.getTournament = async (req, res, next) => {
     where: {
       id: req.params.tournamentId
     },
-    include: [couple]
+    include: [couple],
+    order: [["couples", "puntos", "DESC"]]
   });
 
   //Obtener los nombres y los correos de los jugadores que forman las parejas
@@ -404,8 +416,8 @@ exports.editInfo = async (req, res, next) => {
   }
   let password;
   //Si envia password encriptarlo con bcrypt
-  if (req.body.password) {
-    password = await bcrypt.hashSync(req.body.password, 10);
+  if (req.body.password1 == req.body.password2) {
+    password = await bcrypt.hashSync(req.body.password1, 10);
   }
 
   u.email = req.body.email || u.email.trim().toLowerCase();
@@ -533,6 +545,7 @@ exports.getRondaInfo = async (req, res, next) => {
 
     //Obtener los nombres y los correos de los jugadores que forman las parejas
     nombresDelTorneo = [];
+    let nombresParejas = [];
     for (p of parejas) {
       user1 = await user.findOne({
         where: {
@@ -544,12 +557,23 @@ exports.getRondaInfo = async (req, res, next) => {
           id: p.user2Id
         }
       });
-      //nombresDelTorneo.push(p.id, user1.name + " " + user1.lastname);
-      //nombresDelTorneo.push(user2.name + " " + user2.lastname);
-      p.dataValues.user1Name = user1.name;
-      p.dataValues.user1LastName = user1.lastname;
-      p.dataValues.user2Name = user2.name;
-      p.dataValues.user2LastName = user2.lastname;
+      nombresDelTorneo.push(p.id, user1.name + " " + user1.lastname);
+      nombresDelTorneo.push(user2.name + " " + user2.lastname);
+      nombresParejas[p.id] =
+        user1.name +
+        " " +
+        user1.lastname +
+        " y " +
+        user2.name +
+        " " +
+        user2.lastname;
+      // p.dataValues.user1Name = user1.name;
+      // p.dataValues.user1LastName = user1.lastname;
+      // p.dataValues.user2Name = user2.name;
+      // p.dataValues.user2LastName = user2.lastname;
+
+      // nombresJugadores[user1.id] = user1.name + " " + user1.lastname;
+      // nombresJugadores[user2.id] = user2.name + " " + user2.lastname;
     }
 
     partidos = await tourney.getPartidos({
@@ -557,6 +581,11 @@ exports.getRondaInfo = async (req, res, next) => {
         numeroRonda: tourney.rondaActual
       }
     });
+
+    for (p of partidos) {
+      p.dataValues.couple1FullName = nombresParejas[p.dataValues.couple1Id];
+      p.dataValues.couple2FullName = nombresParejas[p.dataValues.couple2Id];
+    }
 
     return res.status(200).json({
       parejas: parejas,
@@ -582,8 +611,14 @@ exports.getRondaInfo = async (req, res, next) => {
     }
   });
 
+  for (p of partidos) {
+    p.dataValues.couple1FullName = nombresJugadores[p.dataValues.couple1Id];
+    p.dataValues.couple2FullName = nombresJugadores[p.dataValues.couple2Id];
+  }
+
   //Obtener los nombres y los correos de los jugadores que forman las parejas
   nombresDelTorneo = [];
+  let nombresJugadores = {};
   for (p of parejas) {
     c = await couple.findOne({
       where: {
@@ -601,6 +636,8 @@ exports.getRondaInfo = async (req, res, next) => {
         id: c.user2Id
       }
     });
+    nombresJugadores[user1.id] = user1.name + " " + user1.lastname;
+    nombresJugadores[user2.id] = user2.name + " " + user2.lastname;
     nombresDelTorneo.push(c.id, user1.name + " " + user1.lastname);
     nombresDelTorneo.push(user2.name + " " + user2.lastname);
   }
