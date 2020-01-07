@@ -583,6 +583,23 @@ exports.getRondaInfo = async (req, res, next) => {
     });
 
     for (p of partidos) {
+      user1 = await user.findOne({
+        where: {
+          id: c.user1Id
+        }
+      });
+      user2 = await user.findOne({
+        where: {
+          id: c.user2Id
+        }
+      });
+      c.dataValues.user1Name = user1.name;
+      c.dataValues.user1LastName = user1.lastname;
+      c.dataValues.user2Name = user2.name;
+      c.dataValues.user2LastName = user2.lastname;
+      //nombresDelTorneo.push(c.id, user1.name + " " + user1.lastname);
+      //nombresDelTorneo.push(user2.name + " " + user2.lastname);
+
       p.dataValues.couple1FullName = nombresParejas[p.dataValues.couple1Id];
       p.dataValues.couple2FullName = nombresParejas[p.dataValues.couple2Id];
     }
